@@ -35,6 +35,7 @@ expressServer.use(function (req, res, next) {
 });
 
 expressServer.use(bodyParser.urlencoded({extended: false}));
+expressServer.use(bodyParser.json());
 expressServer.use(sessionMiddleware);
 
 expressServer.use(express.static('public'));

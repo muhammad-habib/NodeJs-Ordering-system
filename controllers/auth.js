@@ -11,20 +11,28 @@ function sha256(msg) {
 }
 
 router.post("/login", function (request, response) {
+
     var email = request.body.email;
     var password = request.body.password;
+    
     if (!validator.isEmail(email) || validator.isEmpty(password)) {
         response.json({status: "Wrong Data"});
     } else {
         mongoose.model("users").find({email: email}, {password: true}, function (err, user) {
-            if (!err && bcrypt.compareSync(password, user[0].password)) {
-                response.json({status: "login successfully"});
+            if (!err && user[0].password === sha256(password)) {
+                response.json(
+                    {
+                        id: user[0].id,
+                        name: user[0].name,
+                        email: user[0].email,
+                        token: 'fake-jwt-token'
+                    }
+                );
             }
             else {
-                response.json({status: "login failed"});
+                response.status(400).json({status: "Invalid email or password."});
             }
         })
-
     }
 });
 
@@ -32,26 +40,26 @@ router.post("/register",bodyParser.urlencoded({extended: false}) ,function (requ
 console.log(request.body);
     var UserModel = mongoose.model("users");
 
-    var user = new UserModel({
-        name: request.body.name,
-        email: request.body.email,
-        password: sha256(request.body.password),
-    });
+    UserModel.find({email: request.body.email},function (err,users) {
+        if (users.length) {
+            response.status(400).json({error:"Email already in use."});
+        }else{
+            var user = new UserModel({
+                name: request.body.name,
+                email: request.body.email,
+                password: sha256(request.body.password),
+            });
 
-    user.save(function (err) {
-        if (!err) {
-            response.json(
-                {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    token: 'fake-jwt-token'
+            user.save(function (err) {
+                if (!err) {
+                    response.json({"status" : "done"})
+                } else {
+                    response.status(400).json({error:"Registeration Failed"});
                 }
-            );
-        } else {
-            response.json({status: "registeration failed"});
+            });
         }
     });
+
 });
 
 
