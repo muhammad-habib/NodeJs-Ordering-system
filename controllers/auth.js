@@ -16,7 +16,7 @@ router.post("/login", function (request, response) {
     var password = request.body.password;
 
     if (!validator.isEmail(email) || validator.isEmpty(email) || validator.isEmpty(password)) {
-        response.json({status: "Wrong Data"});
+        response.status(400).json({error: "Wrong Data."});
     } else {
         mongoose.model("users").find({email: email}, {password: true, access_token: true}, function (err, user) {
             if (!err && sha256(password) == user[0].password) {
@@ -30,7 +30,7 @@ router.post("/login", function (request, response) {
                 );
             }
             else {
-                response.status(400).json({status: "Invalid email or password."});
+                response.status(400).json({error: "Invalid email or password."});
             }
         })
     }
