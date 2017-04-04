@@ -14,18 +14,18 @@ router.post("/login", function (request, response) {
 
     var email = request.body.email;
     var password = request.body.password;
-    
-    if (!validator.isEmail(email) || validator.isEmpty(password)) {
+
+    if (!validator.isEmail(email) || validator.isEmpty(email) || validator.isEmpty(password)) {
         response.json({status: "Wrong Data"});
     } else {
-        mongoose.model("users").find({email: email}, {password: true}, function (err, user) {
-            if (!err && user[0].password === sha256(password)) {
+        mongoose.model("users").find({email: email}, {password: true, access_token: true}, function (err, user) {
+            if (!err && sha256(password) == user[0].password) {
                 response.json(
                     {
                         id: user[0].id,
                         name: user[0].name,
                         email: user[0].email,
-                        token: 'fake-jwt-token'
+                        token: user[0].access_token
                     }
                 );
             }
@@ -36,14 +36,23 @@ router.post("/login", function (request, response) {
     }
 });
 
-router.post("/register",bodyParser.urlencoded({extended: false}) ,function (request, response) {
-console.log(request.body);
-    var UserModel = mongoose.model("users");
+router.post("/register", bodyParser.urlencoded({extended: false}), function (request, response) {
 
-    UserModel.find({email: request.body.email},function (err,users) {
+    var UserModel = mongoose.model("users");
+    var access_token = sha256(request.body.name + new Date() + Math.random());
+    var name = request.body.name;
+    var email = request.body.email;
+    var password = request.body.password;
+    var errors = [];
+
+    if (validator.isEmpty(name) || validator.isEmpty(email) || validator.isEmpty(password)) {
+        errors.push("Please Fill All The Fields");
+    }
+
+    UserModel.find({email: request.body.email}, function (err, users) {
         if (users.length) {
-            response.status(400).json({error:"Email already in use."});
-        }else{
+            response.status(400).json({error: "Email already in use."});
+        } else {
             var user = new UserModel({
                 name: request.body.name,
                 email: request.body.email,
@@ -52,15 +61,14 @@ console.log(request.body);
 
             user.save(function (err) {
                 if (!err) {
-                    response.json({"status" : "done"})
+                    response.json({"status": "done"})
                 } else {
-                    response.status(400).json({error:"Registeration Failed"});
+                    response.status(400).json({error: "Registeration Failed"});
                 }
             });
         }
     });
 
 });
-
 
 module.exports = router;

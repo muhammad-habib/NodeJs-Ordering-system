@@ -7,6 +7,7 @@ var users = new Schema({
     password: {type: String, required: true},
     online: {type: Boolean, default: false},
     avatar: String,
+    access_token: String,
     friends: [{type: Schema.ObjectId, ref: "users"}]
 })
 
