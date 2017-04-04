@@ -13,12 +13,12 @@ function sha256(msg) {
 router.post("/login", function (request, response) {
     var email = request.body.email;
     var password = request.body.password;
-    if (!validator.isEmail(email) || validator.isEmpty(password)) {
+    if (!validator.isEmail(email)|| validator.isEmpty(email) || validator.isEmpty(password)) {
         response.json({status: "Wrong Data"});
     } else {
-        mongoose.model("users").find({email: email}, {password: true}, function (err, user) {
-            if (!err && bcrypt.compareSync(password, user[0].password)) {
-                response.json({status: "login successfully"});
+        mongoose.model("users").find({email: email}, {password: true , access_token: true}, function (err, user) {
+            if (!err && sha256(password)== user[0].password) {
+                response.json({status: "login successfully", access_token: user[0].access_token });
             }
             else {
                 response.json({status: "login failed"});
@@ -29,13 +29,33 @@ router.post("/login", function (request, response) {
 });
 
 router.post("/register",bodyParser.urlencoded({extended: false}) ,function (request, response) {
-console.log(request.body);
-    var UserModel = mongoose.model("users");
 
+    var UserModel = mongoose.model("users");
+    var access_token=sha256(request.body.name+new Date()+Math.random());
+    var name=request.body.name;
+    var email=request.body.email;
+    var password=request.body.password;
+    var errors=[];
+
+    if(validator.isEmpty(name) || validator.isEmpty(email) ||validator.isEmpty(password)){
+        errors.push("Please Fill All The Fields");
+    }
+
+    if(!validator.isEmail(email)){
+      errors.push("Invalid Email");
+    }
+
+    if(errors.length>0){
+      response.json({status: "registeration failed" , errors:errors});
+    }    
+
+    else{
+     
     var user = new UserModel({
-        name: request.body.name,
-        email: request.body.email,
-        password: sha256(request.body.password),
+        name: name,
+        email: email,
+        password: sha256(password),
+        access_token: access_token
     });
 
     user.save(function (err) {
@@ -45,13 +65,14 @@ console.log(request.body);
                     id: user.id,
                     name: user.name,
                     email: user.email,
-                    token: 'fake-jwt-token'
+                    access_token: user.access_token
                 }
             );
         } else {
             response.json({status: "registeration failed"});
         }
     });
+    }
 });
 
 
