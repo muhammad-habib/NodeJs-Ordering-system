@@ -1,57 +1,58 @@
-var express=require("express");
-var router=express.Router();
-var mongoose=require("mongoose");
-var bcrypt=require("bcrypt");
-var multer=require("multer");
+var express = require("express");
+var router = express.Router();
+var mongoose = require("mongoose");
+var crypto = require('crypto'), shasum = crypto.createHash('sha1');
+var bodyParser = require("body-parser");
+
 var validator = require("validator");
-var uploadFileMiddleware=multer({dest:__dirname+"/../public",
-fileFilter:function(request,file,cb){
-  if(file.mimetype=="image/jpeg"){
-    request.fileStatus="file uploaded";
-    cb(null,true);
-  }else{
-    request.fileStatus="file not uploaded";
-    cb(null,false);
-  }
 
-}})
+function sha256(msg) {
+    return crypto.createHash("sha256").update(msg).digest("base64");
+}
 
+router.post("/login", function (request, response) {
+    var email = request.body.email;
+    var password = request.body.password;
+    if (!validator.isEmail(email) || validator.isEmpty(password)) {
+        response.json({status: "Wrong Data"});
+    } else {
+        mongoose.model("users").find({email: email}, {password: true}, function (err, user) {
+            if (!err && bcrypt.compareSync(password, user[0].password)) {
+                response.json({status: "login successfully"});
+            }
+            else {
+                response.json({status: "login failed"});
+            }
+        })
 
-router.post("/login",uploadFileMiddleware.single("avatar"),function(request,response){
-	var email= request.body.email;
-	var password=request.body.password;
-    if(!validator.isEmail(email) || validator.isEmpty(password)){
-    response.json({status:"Wrong Data"});
-  }else{
-  	mongoose.model("users").find({email:email},{password:true},function(err,user){
-  		if (!err && bcrypt.compareSync(password,user[0].password)){
-  			response.json({status:"login successfully"});
-  		}
-  		else{
-  			response.json({status:"login failed"});
-  		}
-  	})
+    }
+});
 
-  }
-})
+router.post("/register",bodyParser.urlencoded({extended: false}) ,function (request, response) {
+console.log(request.body);
+    var UserModel = mongoose.model("users");
 
-router.post("/register",uploadFileMiddleware.single("avatar"),function(request,response){
-  
-  var UserModel=mongoose.model("users");
-  var salt=bcrypt.genSaltSync();
-  var hashedPassword=bcrypt.hashSync(request.body.password,salt);
-  var user = new UserModel({name:request.body.name,email:request.body.email,
-  	password:hashedPassword,avatar:request.file.filename});
+    var user = new UserModel({
+        name: request.body.name,
+        email: request.body.email,
+        password: sha256(request.body.password),
+    });
 
-  user.save(function(err){
-	if(!err){
-		response.json({status:"registered successfully"});
-	}
-	else{
-		response.json({status:"registeration failed"});
-	}
-	});
+    user.save(function (err) {
+        if (!err) {
+            response.json(
+                {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    token: 'fake-jwt-token'
+                }
+            );
+        } else {
+            response.json({status: "registeration failed"});
+        }
+    });
 });
 
 
-module.exports=router;
+module.exports = router;
