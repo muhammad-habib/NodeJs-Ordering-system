@@ -1,0 +1,33 @@
+{
+  "name": "our_project",
+  "version": "1.0.0",
+  "description": "project",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seifElislam/NodeJs-Ordering-system.git"
+  },
+  "author": "our group",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/seifElislam/NodeJs-Ordering-system/issues"
+  },
+  "homepage": "https://github.com/seifElislam/NodeJs-Ordering-system#readme",
+  "dependencies": {
+    "bcrypt": "^1.0.2",
+    "connect-flash": "^0.1.1",
+    "express": "^4.15.2",
+    "express-session": "^1.15.2",
+    "fbgraph": "^1.4.1",
+    "http": "0.0.0",
+    "mongoose": "^4.9.3",
+    "multer": "^1.3.0",
+    "request": "^2.81.0",
+    "sha.js": "^2.4.8",
+    "socket.io": "^1.7.3",
+    "validator": "^7.0.0"
+  }
+}
