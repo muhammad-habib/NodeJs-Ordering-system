@@ -16,7 +16,7 @@ function sha256(msg) {
 
 router.post("/login", function (request, response) {
 
-    var email = request.body.email;
+    var email = validator.escape(request.body.email);
     var password = request.body.password;
 
     if (!validator.isEmail(email) || validator.isEmpty(email) || validator.isEmpty(password)) {
@@ -44,8 +44,8 @@ router.post("/register", bodyParser.urlencoded({extended: false}), function (req
 
     var UserModel = mongoose.model("users");
 
-    var name = request.body.name;
-    var email = request.body.email;
+    var name = validator.escape(request.body.name);
+    var email = validator.escape(request.body.email);
     var password = request.body.password;
 
     if (validator.isEmpty(name) || validator.isEmpty(email) || validator.isEmpty(password)) {
