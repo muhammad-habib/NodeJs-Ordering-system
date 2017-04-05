@@ -47,31 +47,30 @@ router.post("/register", bodyParser.urlencoded({extended: false}), function (req
     var name = request.body.name;
     var email = request.body.email;
     var password = request.body.password;
-    var errors = [];
 
     if (validator.isEmpty(name) || validator.isEmpty(email) || validator.isEmpty(password)) {
-        errors.push("Please Fill All The Fields");
+        response.status(400).json({error: "Please Fill All The Fields"});
+    }else{
+        UserModel.find({email: request.body.email}, function (err, users) {
+            if (users.length) {
+                response.status(400).json({error: "Email already in use."});
+            } else {
+                var user = new UserModel({
+                    name: request.body.name,
+                    email: request.body.email,
+                    password: sha256(request.body.password),
+                });
+
+                user.save(function (err) {
+                    if (!err) {
+                        response.json({"status": "done"})
+                    } else {
+                        response.status(400).json({error: "Registeration Failed"});
+                    }
+                });
+            }
+        });
     }
-
-    UserModel.find({email: request.body.email}, function (err, users) {
-        if (users.length) {
-            response.status(400).json({error: "Email already in use."});
-        } else {
-            var user = new UserModel({
-                name: request.body.name,
-                email: request.body.email,
-                password: sha256(request.body.password),
-            });
-
-            user.save(function (err) {
-                if (!err) {
-                    response.json({"status": "done"})
-                } else {
-                    response.status(400).json({error: "Registeration Failed"});
-                }
-            });
-        }
-    });
 
 });
 
