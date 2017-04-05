@@ -15,7 +15,7 @@ function sha256(msg) {
 }
 
 router.post("/login", function (request, response) {
-console.log(request.body);
+
     var email = request.body.email;
     var password = request.body.password;
 
