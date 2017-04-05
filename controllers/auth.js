@@ -43,6 +43,7 @@ console.log(request.body);
 router.post("/register", bodyParser.urlencoded({extended: false}), function (request, response) {
 
     var UserModel = mongoose.model("users");
+
     var name = request.body.name;
     var email = request.body.email;
     var password = request.body.password;
