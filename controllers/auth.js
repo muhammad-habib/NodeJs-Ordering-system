@@ -1,6 +1,8 @@
 var express = require("express");
 var router = express.Router();
 
+var config = require('../config');
+
 var mongoose = require("mongoose");
 var crypto = require('crypto'), shasum = crypto.createHash('sha1');
 var bodyParser = require("body-parser");
@@ -26,7 +28,7 @@ console.log(request.body);
                     id: user._id,
                     name: user.name,
                     email: user.email,
-                    token: jwt.sign({ sub: user._id }, "123@321")
+                    token: jwt.sign({ sub: user._id }, config.APP_SECRET)
                 };
                 console.log(userData);
                 response.json(userData);
