@@ -9,10 +9,7 @@ var bodyParser = require("body-parser");
 
 var fs = require("fs");
 
-var session = require("express-session");
-var sessionMiddleware = session({
-    secret: "#@$@#%$^&"
-});
+var expressJwt = require('express-jwt');
 
 var mongoose = require("mongoose");
 mongoose.connect("mongodb://localhost:27017/nodejs_project");
@@ -34,8 +31,9 @@ expressServer.use(function (req, res, next) {
     next();
 });
 
+expressServer.use(expressJwt({ secret: "123@321" }).unless({ path: ['/auth/login', '/users/auth'] }));
 expressServer.use(bodyParser.urlencoded({extended: false}));
-expressServer.use(sessionMiddleware);
+expressServer.use(bodyParser.json());
 
 expressServer.use(express.static('public'));
 expressServer.use("/auth", authRouter);
