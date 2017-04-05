@@ -1,6 +1,8 @@
 var express = require('express');
 var expressServer = express();
 
+var config = require('./config');
+
 var http = require('http');
 var httpSERVER = http.createServer(expressServer);
 var io = require('socket.io')(httpSERVER);
@@ -15,6 +17,7 @@ var mongoose = require("mongoose");
 mongoose.connect("mongodb://localhost:27017/nodejs_project");
 
 var authRouter = require("./controllers/auth");
+var usersRouter = require("./controllers/users");
 
 fs.readdirSync(__dirname + "/models").forEach(function (file) {
     require("./models/" + file);
@@ -31,11 +34,12 @@ expressServer.use(function (req, res, next) {
     next();
 });
 
-expressServer.use(expressJwt({ secret: "123@321" }).unless({ path: ['/auth/login', '/users/auth'] }));
+expressServer.use(expressJwt({ secret: config.APP_SECRET }).unless({ path: ['/auth/login', '/auth/register'] }));
 expressServer.use(bodyParser.urlencoded({extended: false}));
 expressServer.use(bodyParser.json());
 
 expressServer.use(express.static('public'));
 expressServer.use("/auth", authRouter);
+expressServer.use("/users", usersRouter);
 
 httpSERVER.listen(8090);
