@@ -31,10 +31,11 @@ router.post("/login", function (request, response) {
 router.post("/register",bodyParser.urlencoded({extended: false}) ,function (request, response) {
 
     var UserModel = mongoose.model("users");
-    var access_token=sha256(request.body.name+new Date()+Math.random());
-    var name=request.body.name;
+    
+  var name=request.body.name;
     var email=request.body.email;
     var password=request.body.password;
+    var access_token=sha256(name+new Date()+Math.random());
     var errors=[];
 
     if(validator.isEmpty(name) || validator.isEmpty(email) ||validator.isEmpty(password)){
