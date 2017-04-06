@@ -10,7 +10,7 @@ var jwt = require('jsonwebtoken');
 
 router.get("/", function(requset,response){
   console.log("list");
-  response.json({g1:{name:"OS",id:2},g2:{name:"java",id:3}});
+  response.json({name:"OS",id:2});
 
 });
 
