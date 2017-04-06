@@ -2,8 +2,8 @@ var mongoose = require("mongoose")
 var Schema = mongoose.Schema;
 
 var groups = new Schema({
-    name: {type: String, required: true},
-    owner: {type: String, required: true},
+    name: String,
+    owner: String,
     members: [{type: Schema.ObjectId, ref: "users"}]
 })
 
