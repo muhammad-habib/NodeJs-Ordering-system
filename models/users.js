@@ -1,6 +1,7 @@
 var mongoose = require("mongoose")
 var Schema = mongoose.Schema;
 
+
 var users = new Schema({
     name: {type: String, required: true},
     email: {type: String, required: true},
@@ -8,7 +9,7 @@ var users = new Schema({
     online: {type: Boolean, default: false},
     avatar: String,
     access_token: String,
-    friends: [{type: Schema.ObjectId, ref: "users"}]
+    following: [{type: Schema.ObjectId, ref: "users"}]
 })
 
 mongoose.model("users", users);

@@ -13,4 +13,19 @@ router.get("/list",function (request, response) {
     response.send("list");
 });
 
+
+
+
+router.get('/:term',function (request, response) {
+    mongoose.model("users").find({email: request.params.term}, function (err, user) {
+        if(!err)
+        {
+            response.json(user);
+        }
+        else {
+            response.json({error: "Not found"});
+        }
+    });
+});
+
 module.exports = router;

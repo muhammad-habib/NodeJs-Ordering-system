@@ -18,6 +18,7 @@ mongoose.connect("mongodb://localhost:27017/nodejs_project");
 
 var authRouter = require("./controllers/auth");
 var usersRouter = require("./controllers/users");
+var followRouter = require("./controllers/follow");
 
 fs.readdirSync(__dirname + "/models").forEach(function (file) {
     require("./models/" + file);
@@ -29,17 +30,26 @@ io.on("connection", function (socketClient) {
 expressServer.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Headers', 'x-access-token,content-type,Accept,Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
     next();
 });
 
-expressServer.use(expressJwt({ secret: config.APP_SECRET }).unless({ path: ['/auth/login', '/auth/register'] }));
+expressServer.use(expressJwt({ secret: config.APP_SECRET }).unless({ path: ['/auth/login',
+                                                                            '/auth/register',
+                                                                            '/users/list',
+                                                                            /\/follow\/\w*/ig
+                                                                            ]
+                                                                    }));
+expressServer.use(function (req,res,next) {
+    console.log(req.headers.authorization);
+    next();
+});
 expressServer.use(bodyParser.urlencoded({extended: false}));
 expressServer.use(bodyParser.json());
 
 expressServer.use(express.static('public'));
 expressServer.use("/auth", authRouter);
 expressServer.use("/users", usersRouter);
-
+expressServer.use("/follow", followRouter);
 httpSERVER.listen(8090);
