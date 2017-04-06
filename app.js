@@ -40,16 +40,18 @@ expressServer.use(function (req, res, next) {
 expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
     path: ['/auth/login',
         '/auth/register',
-        '/users/search',
+        //'/users/list',
         /\/follow\/\w*/ig
     ]
 }));
+
 
 expressServer.use(function (req, res, next) {
 
     console.log(req.headers.authorization);
     next();
 });
+
 expressServer.use(bodyParser.urlencoded({extended: false}));
 expressServer.use(bodyParser.json());
 
