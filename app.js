@@ -36,28 +36,14 @@ expressServer.use(function (req, res, next) {
     next();
 });
 
-<<<<<<< HEAD
-expressServer.use(expressJwt({ secret: config.APP_SECRET }).unless({ path: ['/auth/login',
-                                                                            '/auth/register',
-                                                                            '/users/list',
-                                                                            /\/follow\/\w*/ig
-                                                                            ]
-                                                                    }));
-expressServer.use(function (req,res,next) {
-=======
 expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
     path: ['/auth/login',
         '/auth/register',
-        '/users/search',
+        //'/users/list',
         /\/follow\/\w*/ig
     ]
 }));
 
-expressServer.use(function (req, res, next) {
->>>>>>> a648ff492c9f3f9db362e77e3945a07617e349cf
-    console.log(req.headers.authorization);
-    next();
-});
 expressServer.use(bodyParser.urlencoded({extended: false}));
 expressServer.use(bodyParser.json());
 
