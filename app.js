@@ -37,7 +37,8 @@ expressServer.use(function (req, res, next) {
 });
 
 expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
-    path: ['/auth/login',
+    path: [
+        '/auth/login',
         '/auth/register',
         //'/users/list',
         /\/follow\/\w*/ig
