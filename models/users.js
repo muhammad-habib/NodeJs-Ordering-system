@@ -10,6 +10,8 @@ var users = new Schema({
     avatar: String,
     access_token: String,
     following: [{type: Schema.ObjectId, ref: "users"}]
-})
+});
+
+users.index({name: 'text'});
 
 mongoose.model("users", users);
