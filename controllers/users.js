@@ -40,7 +40,7 @@ router.get("/search",function (request, response) {
             });
             break;
     }
-    response.status(400).json({error: "Nothing Found"});
+    //response.status(400).json({error: "Nothing Found"});
 });
 
 module.exports = router;
