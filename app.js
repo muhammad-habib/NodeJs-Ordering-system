@@ -19,6 +19,7 @@ mongoose.connect("mongodb://localhost:27017/nodejs_project");
 var authRouter = require("./controllers/auth");
 var usersRouter = require("./controllers/users");
 var followRouter = require("./controllers/follow");
+var groupsRouter = require("./controllers/groups");
 
 fs.readdirSync(__dirname + "/models").forEach(function (file) {
     require("./models/" + file);
@@ -35,12 +36,12 @@ expressServer.use(function (req, res, next) {
     next();
 });
 
-expressServer.use(expressJwt({ secret: config.APP_SECRET }).unless({ path: ['/auth/login',
-                                                                            '/auth/register',
-                                                                            '/users/list',
-                                                                            /\/follow\/\w*/ig
-                                                                            ]
-                                                                    }));
+// expressServer.use(expressJwt({ secret: config.APP_SECRET }).unless({ path: ['/auth/login',
+//                                                                             '/auth/register',
+//                                                                             '/users/list',
+//                                                                             /\/follow\/\w*/ig
+//                                                                             ]
+//                                                                     }));
 expressServer.use(function (req,res,next) {
     console.log(req.headers.authorization);
     next();
@@ -52,4 +53,5 @@ expressServer.use(express.static('public'));
 expressServer.use("/auth", authRouter);
 expressServer.use("/users", usersRouter);
 expressServer.use("/follow", followRouter);
+expressServer.use("/groups", groupsRouter);
 httpSERVER.listen(8090);
