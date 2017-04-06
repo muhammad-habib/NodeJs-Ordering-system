@@ -36,12 +36,12 @@ expressServer.use(function (req, res, next) {
     next();
 });
 
-// expressServer.use(expressJwt({ secret: config.APP_SECRET }).unless({ path: ['/auth/login',
-//                                                                             '/auth/register',
-//                                                                             '/users/list',
-//                                                                             /\/follow\/\w*/ig
-//                                                                             ]
-//                                                                     }));
+expressServer.use(expressJwt({ secret: config.APP_SECRET }).unless({ path: ['/auth/login',
+                                                                            '/auth/register',
+                                                                            '/users/list',
+                                                                            /\/follow\/\w*/ig
+                                                                            ]
+                                                                    }));
 expressServer.use(function (req,res,next) {
     console.log(req.headers.authorization);
     next();
