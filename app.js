@@ -14,8 +14,8 @@ var fs = require("fs");
 var expressJwt = require('express-jwt');
 
 var mongoose = require("mongoose");
-//mongoose.connect("mongodb://iti:iti_os_37@ds155160.mlab.com:55160/iti_orders");
-mongoose.connect("mongodb://localhost:27017/nodejs_project");
+mongoose.connect("mongodb://iti:iti_os_37@ds155160.mlab.com:55160/iti_orders");
+
 
 var authRouter = require("./controllers/auth");
 var usersRouter = require("./controllers/users");
@@ -40,14 +40,14 @@ expressServer.use(function (req, res, next) {
 
 expressServer.use(express.static('public'));
 
-// expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
-//     path: [
-//         '/auth/login',
-//         '/auth/register',
-//         '/upload/photo',
-//         /\/follow\/\w*/ig
-//     ]
-// }));
+expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
+    path: [
+        '/auth/login',
+        '/auth/register',
+        '/upload/photo',
+        /\/follow\/\w*/ig
+    ]
+}));
 
 expressServer.use(bodyParser.urlencoded({extended: false}));
 expressServer.use(bodyParser.json());
