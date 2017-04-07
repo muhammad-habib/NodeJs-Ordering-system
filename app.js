@@ -14,7 +14,8 @@ var fs = require("fs");
 var expressJwt = require('express-jwt');
 
 var mongoose = require("mongoose");
-mongoose.connect("mongodb://iti:iti_os_37@ds155160.mlab.com:55160/iti_orders");
+//mongoose.connect("mongodb://iti:iti_os_37@ds155160.mlab.com:55160/iti_orders");
+mongoose.connect("mongodb://localhost:27017/nodejs_project");
 
 var authRouter = require("./controllers/auth");
 var usersRouter = require("./controllers/users");
