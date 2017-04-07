@@ -71,7 +71,9 @@ router.post("/register", bodyParser.urlencoded({extended: false}), function (req
             }
         });
     }
-     ///testing
+   
 });
+
+
 
 module.exports = router;
