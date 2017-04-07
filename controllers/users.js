@@ -10,7 +10,16 @@ var jwt = require('jsonwebtoken');
 
 
 router.get("/list",function (request, response) {
-    response.send("list");
+    mongoose.model("users").find({},function (err, users) {
+        if(!err)
+        {
+            response.json(users);
+        }
+        else {
+
+            response.status(400).json({error: err});
+        }
+    });
 });
 
 //users/search?field=name&q=Moustafa

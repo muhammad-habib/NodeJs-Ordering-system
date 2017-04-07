@@ -40,7 +40,7 @@ expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
     path: [
         '/auth/login',
         '/auth/register',
-        //'/users/list',
+        '/users/list',
         /\/follow\/\w*/ig
     ]
 }));
