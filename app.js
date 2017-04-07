@@ -40,14 +40,14 @@ expressServer.use(function (req, res, next) {
 
 expressServer.use(express.static('public'));
 
-expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
-    path: [
-        '/auth/login',
-        '/auth/register',
-        '/upload/photo',
-        /\/follow\/\w*/ig
-    ]
-}));
+// expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
+//     path: [
+//         '/auth/login',
+//         '/auth/register',
+//         '/upload/photo',
+//         /\/follow\/\w*/ig
+//     ]
+// }));
 
 expressServer.use(bodyParser.urlencoded({extended: false}));
 expressServer.use(bodyParser.json());
