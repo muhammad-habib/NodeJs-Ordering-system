@@ -5,10 +5,11 @@ var config = require('../config');
 
 var mongoose = require("mongoose");
 var crypto = require('crypto'), shasum = crypto.createHash('sha1');
-var bodyParser = require("body-parser");
 
 var validator = require("validator");
 var jwt = require('jsonwebtoken');
+
+var multer = require('multer');
 
 function sha256(msg) {
     return crypto.createHash("sha256").update(msg).digest("base64");
@@ -40,7 +41,7 @@ router.post("/login", function (request, response) {
     }
 });
 
-router.post("/register", bodyParser.urlencoded({extended: false}), function (request, response) {
+router.post("/register", function (request, response) {
 
     var UserModel = mongoose.model("users");
 
@@ -58,7 +59,8 @@ router.post("/register", bodyParser.urlencoded({extended: false}), function (req
                 var user = new UserModel({
                     name: request.body.name,
                     email: request.body.email,
-                    password: sha256(request.body.password),
+                    avatar: request.body.avatar,
+                    password: sha256(request.body.password)
                 });
 
                 user.save(function (err) {
