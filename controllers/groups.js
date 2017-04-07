@@ -4,7 +4,7 @@ var router = express.Router();
 var mongoose = require("mongoose");
 var crypto = require('crypto'), shasum = crypto.createHash('sha1');
 var bodyParser = require("body-parser");
-
+var helpers = require("../util/helpers");
 var validator = require("validator");
 var jwt = require('jsonwebtoken');
 
@@ -23,25 +23,16 @@ router.get("/list", function(request,response){
 
 });
 
-router.get("/:name/members",function(request,response){
+router.get("/",function(request,response){
   console.log("list members");
 
-  // mongoose.model("groups").find({name:request.params.name}.populate("users"), function (err, groups) {
-  //     if(!err)
-  //     {
-  //         response.json(groups);
-  //     }
-  //     else {
-  //         response.status(400).json({error: err});
-  //     }
-  // });
 
-    response.json(request.params.name);
-
-  mongoose.model("groups").find({name:request.params.name}).populate('users').exec(function (err, members) {
-    console.log(members);
-          // if (err)
-          //     response.json({error: "Not found"});
+  mongoose.model("groups").findOne({name:request.params.name},{_id:0, members: 1}).populate("members").exec(function (err, members) {
+    console.log("prams",request.params);
+           if (err){
+              response.json({error: "Not found"});
+              console.log("error in list members");
+            }
           // else if(following.following.length == 1 &&  following.following[0] == null ) {
           //     following.following.pop();
           //     following.save();
@@ -51,24 +42,40 @@ router.get("/:name/members",function(request,response){
           //     response.json(following.following);
           // }
 
+           else {
+               response.json(members);
+               console.log("members :",members);
+           }
   })
 
 
 });
 
 
-router.get("/:name/members/add/:id",function(request,response){
-  console.log("list members");
-
-  mongoose.model("groups").update({name:request.params.name},{$push:{members:request.params.id}},{}, function (err, groups) {
-      if(!err)
+router.get("/members/add",function(request,response){
+  console.log("add member");
+  console.log("query :",request.query);
+  mongoose.model("groups").find({name:request.query.name}, function (err, group) {
+    console.log(group);
+      if (!err)
       {
-          response.json({"status": "done"});
+          if (helpers.isInArray(request.query.uid,group[0].members))
+          {
+              response.json({error: "user  already in your followings"});
+          }
+          else
+          {
+              group.members.push(request.query.uid);
+              group.save(function(error) {
+                  if (error)
+                      response.json({error: "error in handeling your request"});
+                  response.json(group);
+                  console.log(group);
+              });
+          }
       }
-      else {
-          response.status(400).json({error: err});
-      }
-  });
+
+  })
 
 
 });

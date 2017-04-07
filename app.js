@@ -16,10 +16,12 @@ var expressJwt = require('express-jwt');
 var mongoose = require("mongoose");
 mongoose.connect("mongodb://iti:iti_os_37@ds155160.mlab.com:55160/iti_orders");
 
+
 var authRouter = require("./controllers/auth");
 var usersRouter = require("./controllers/users");
 var followRouter = require("./controllers/follow");
 var groupsRouter = require("./controllers/groups");
+var uploadRouter = require("./controllers/upload");
 
 fs.readdirSync(__dirname + "/models").forEach(function (file) {
     require("./models/" + file);
@@ -34,16 +36,29 @@ expressServer.use(function (req, res, next) {
     next();
 });
 
+expressServer.use(express.static('public'));
 
 expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
     path: [
         '/auth/login',
         '/auth/register',
-        '/users/list',
-        /\/groups\/\w*\//ig,
+        '/upload/photo',
+        /\/follow\/\w*/ig,
+       '/users/list',
+        /\/groups\/\w*/ig,
     ]
 }));
 
+
+
+
+
+expressServer.use(function (req, res, next) {
+    // console.log(Object.keys(usersSockets).length);
+    req.usersSockets = usersSockets;
+    req.io = io;
+    next();
+});
 
 
 
@@ -76,23 +91,16 @@ socket.on('logout-message',(obj) => {
 });
 
 
-expressServer.use(function (req, res, next) {
-    // console.log(Object.keys(usersSockets).length);
-    req.usersSockets = usersSockets;
-    req.io = io;
-    next();
-});
-
 
 expressServer.use(bodyParser.urlencoded({extended: false}));
 expressServer.use(bodyParser.json());
 
-expressServer.use(express.static('public'));
 expressServer.use("/auth", authRouter);
 expressServer.use("/users", usersRouter);
 expressServer.use("/follow", followRouter);
 expressServer.use("/groups", groupsRouter);
 
+expressServer.use("/upload", uploadRouter);
 
 httpSERVER.listen(8090);
 
