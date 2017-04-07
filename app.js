@@ -36,6 +36,7 @@ expressServer.use(function (req, res, next) {
     next();
 });
 
+
 expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
     path: [
         '/auth/login',
@@ -44,6 +45,14 @@ expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
         /\/follow\/\w*/ig
     ]
 }));
+
+
+
+expressServer.use(function (req, res, next) {
+
+    console.log(req.headers.authorization);
+    next();
+});
 
 expressServer.use(bodyParser.urlencoded({extended: false}));
 expressServer.use(bodyParser.json());
