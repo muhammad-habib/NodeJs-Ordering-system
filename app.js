@@ -20,6 +20,7 @@ var authRouter = require("./controllers/auth");
 var usersRouter = require("./controllers/users");
 var followRouter = require("./controllers/follow");
 var groupsRouter = require("./controllers/groups");
+var uploadRouter = require("./controllers/upload");
 
 fs.readdirSync(__dirname + "/models").forEach(function (file) {
     require("./models/" + file);
@@ -36,30 +37,25 @@ expressServer.use(function (req, res, next) {
     next();
 });
 
+expressServer.use(express.static('public'));
 
 expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
     path: [
         '/auth/login',
         '/auth/register',
-        '/users/list',
+        '/upload/photo',
         /\/follow\/\w*/ig
     ]
 }));
 
-
-
-expressServer.use(function (req, res, next) {
-
-    console.log(req.headers.authorization);
-    next();
-});
-
 expressServer.use(bodyParser.urlencoded({extended: false}));
 expressServer.use(bodyParser.json());
 
-expressServer.use(express.static('public'));
 expressServer.use("/auth", authRouter);
 expressServer.use("/users", usersRouter);
 expressServer.use("/follow", followRouter);
 expressServer.use("/groups", groupsRouter);
+
+expressServer.use("/upload", uploadRouter);
+
 httpSERVER.listen(8090);
