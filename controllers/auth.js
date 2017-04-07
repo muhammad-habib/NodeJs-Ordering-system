@@ -15,7 +15,6 @@ function sha256(msg) {
 }
 
 router.post("/login", function (request, response) {
-
     var email = validator.escape(request.body.email);
     var password = request.body.password;
 
@@ -30,7 +29,6 @@ router.post("/login", function (request, response) {
                     email: user.email,
                     token: jwt.sign({ sub: user._id }, config.APP_SECRET)
                 };
-                console.log(userData);
                 response.json(userData);
             }
             else {

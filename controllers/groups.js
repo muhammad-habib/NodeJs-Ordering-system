@@ -36,7 +36,9 @@ router.get("/:name/members",function(request,response){
   //     }
   // });
 
-  mongoose.model("groups").find({name:request.params.name},{ _id:0,members: 1}).populate('users').exec(function (err, members) {
+    response.json(request.params.name);
+
+  mongoose.model("groups").find({name:request.params.name}).populate('users').exec(function (err, members) {
     console.log(members);
           // if (err)
           //     response.json({error: "Not found"});
@@ -48,6 +50,7 @@ router.get("/:name/members",function(request,response){
           // else {
           //     response.json(following.following);
           // }
+
   })
 
 

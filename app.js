@@ -6,7 +6,7 @@ var config = require('./config');
 var http = require('http');
 var httpSERVER = http.createServer(expressServer);
 var io = require('socket.io')(httpSERVER);
-
+var usersSockets={};
 var bodyParser = require("body-parser");
 
 var fs = require("fs");
@@ -25,8 +25,6 @@ fs.readdirSync(__dirname + "/models").forEach(function (file) {
     require("./models/" + file);
 });
 
-io.on("connection", function (socketClient) {
-});
 
 expressServer.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -42,17 +40,49 @@ expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
         '/auth/login',
         '/auth/register',
         '/users/list',
-        /\/follow\/\w*/ig
+        /\/groups\/\w*\//ig,
     ]
 }));
 
 
 
-expressServer.use(function (req, res, next) {
 
-    console.log(req.headers.authorization);
+io.on('connection', (socket) => {
+    console.log('user connected');
+
+
+socket.on('disconnect', function(){
+   // delete usersSockets[socket.clientId];
+});
+
+socket.on('add-message', (obj) => {
+    console.log(obj);
+    io.emit('message', {type:'new-message', text: obj});
+});
+
+
+socket.on('login-message',(obj) => {
+    socket.clientId = obj.user_id;
+    usersSockets[obj.user_id] = socket;
+});
+
+
+socket.on('logout-message',(obj) => {
+    delete usersSockets[socket.clientId];
+
+});
+
+
+});
+
+
+expressServer.use(function (req, res, next) {
+    // console.log(Object.keys(usersSockets).length);
+    req.usersSockets = usersSockets;
+    req.io = io;
     next();
 });
+
 
 expressServer.use(bodyParser.urlencoded({extended: false}));
 expressServer.use(bodyParser.json());
@@ -62,4 +92,13 @@ expressServer.use("/auth", authRouter);
 expressServer.use("/users", usersRouter);
 expressServer.use("/follow", followRouter);
 expressServer.use("/groups", groupsRouter);
+
+
 httpSERVER.listen(8090);
+
+
+
+
+
+
+

@@ -11,8 +11,10 @@ var config = require('../config');
 
 
 router.get('/add',function (request, response) {
-
+    console.log(request.usersSockets[request.query.from]);
+    request.usersSockets[request.query.to].emit("message","dfsdfsdfdsf");
     mongoose.model("users").findById(request.query.from, function (err, user) {
+
         if (!err)
         {
             if (helpers.isInArray(request.query.to,user.following))
