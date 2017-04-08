@@ -33,6 +33,17 @@ router.get("/:name/members",function(request,response){
               response.json({error: "Not found"});
               console.log("error in list members");
             }
+<<<<<<< HEAD
+=======
+          // else if(following.following.length == 1 &&  following.following[0] == null ) {
+          //     following.following.pop();
+          //     following.save();
+          //     response.json(following.following);
+          // }
+          // else {
+          //     response.json(following.following);
+          // }
+>>>>>>> 9f1a0f0f0fc09ed4b92a526090089a886a7944c9
 
            else {
                response.json(members);
