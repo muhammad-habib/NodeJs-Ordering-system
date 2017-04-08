@@ -22,6 +22,7 @@ var usersRouter = require("./controllers/users");
 var followRouter = require("./controllers/follow");
 var groupsRouter = require("./controllers/groups");
 var uploadRouter = require("./controllers/upload");
+var ordersRouter = require("./controllers/orders");
 
 fs.readdirSync(__dirname + "/models").forEach(function (file) {
     require("./models/" + file);
@@ -101,6 +102,8 @@ expressServer.use("/follow", followRouter);
 expressServer.use("/groups", groupsRouter);
 
 expressServer.use("/upload", uploadRouter);
+
+expressServer.use("/orders", ordersRouter);
 
 httpSERVER.listen(8090);
 
