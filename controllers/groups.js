@@ -23,7 +23,7 @@ router.get("/list", function(request,response){
 
 });
 
-router.get("/",function(request,response){
+router.get("/:name/members",function(request,response){
   console.log("list members");
 
 
@@ -33,16 +33,25 @@ router.get("/",function(request,response){
               response.json({error: "Not found"});
               console.log("error in list members");
             }
-          // else if(following.following.length == 1 &&  following.following[0] == null ) {
-          //     following.following.pop();
-          //     following.save();
-          //     response.json(following.following);
-          // }
+
            else {
                response.json(members);
                console.log("members :",members);
            }
   })
+
+  // mongoose.model("groups").findOne({name:request.params.name},{_id:0, members: 1}).populate("members").exec(function (err, members) {
+  //   console.log("prams",request.params);
+  //          if (err){
+  //             response.json({error: "Not found"});
+  //             console.log("error in list members");
+  //           }
+  //
+  //          else {
+  //              response.json(members);
+  //              console.log("members :",members);
+  //          }
+  // })
 
 
 });
