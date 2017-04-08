@@ -8,9 +8,11 @@ var helpers = require("../util/helpers");
 var validator = require("validator");
 var jwt = require('jsonwebtoken');
 
-router.get("/list", function(request,response){
-  console.log("list");
-  mongoose.model("groups").find({}, function (err, groups) {
+router.get("/:name/list", function(request,response){
+  console.log("list groups by user");
+  console.log("prams",request.params);
+  mongoose.model("groups").find({owner:request.params.name}, function (err, groups) {
+    console.log("result groups :", groups);
       if(!err)
       {
           response.json(groups);
@@ -23,7 +25,7 @@ router.get("/list", function(request,response){
 
 });
 
-router.get("/",function(request,response){
+router.get("/:name/members",function(request,response){
   console.log("list members");
 
 
@@ -33,20 +35,26 @@ router.get("/",function(request,response){
               response.json({error: "Not found"});
               console.log("error in list members");
             }
-          // else if(following.following.length == 1 &&  following.following[0] == null ) {
-          //     following.following.pop();
-          //     following.save();
-          //     response.json(following.following);
-          // }
-          // else {
-          //     response.json(following.following);
-          // }
+
 
            else {
                response.json(members);
                console.log("members :",members);
            }
   })
+
+  // mongoose.model("groups").findOne({name:request.params.name},{_id:0, members: 1}).populate("members").exec(function (err, members) {
+  //   console.log("prams",request.params);
+  //          if (err){
+  //             response.json({error: "Not found"});
+  //             console.log("error in list members");
+  //           }
+  //
+  //          else {
+  //              response.json(members);
+  //              console.log("members :",members);
+  //          }
+  // })
 
 
 });
@@ -65,8 +73,8 @@ router.get("/members/add",function(request,response){
           }
           else
           {
-              group.members.push(request.query.uid);
-              group.save(function(error) {
+              group[0].members.push(request.query.uid);
+              group[0].save(function(error) {
                   if (error)
                       response.json({error: "error in handeling your request"});
                   response.json(group);
@@ -92,7 +100,8 @@ router.post("/add", bodyParser.urlencoded({extended: false}), function (request,
 
   group.save(function (err) {
       if (!err) {
-          response.json({"status": "done"})
+          response.json(group);
+          console.log("add group sucess");
       } else {
           response.send(err);
           response.status(400).json({error: "adding Failed"});
