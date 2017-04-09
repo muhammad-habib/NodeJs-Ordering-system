@@ -9,22 +9,18 @@ var validator = require("validator");
 var jwt = require('jsonwebtoken');
 var config = require('../config');
 
-
-router.get('/add',function (request, response) {
+router.get('/add', function (request, response) {
     console.log(request.usersSockets[request.query.from]);
-    request.usersSockets[request.query.to].emit("message","dfsdfsdfdsf");
+    request.usersSockets[request.query.to].emit("message", "dfsdfsdfdsf");
     mongoose.model("users").findById(request.query.from, function (err, user) {
 
-        if (!err)
-        {
-            if (helpers.isInArray(request.query.to,user.following))
-            {
+        if (!err) {
+            if (helpers.isInArray(request.query.to, user.following)) {
                 response.json({error: "user  already in your followings"});
             }
-            else
-            {
+            else {
                 user.following.push(request.query.to);
-                user.save(function(error) {
+                user.save(function (error) {
                     if (error)
                         response.json({error: "error in handeling your request"});
                     response.json(user);
@@ -35,26 +31,19 @@ router.get('/add',function (request, response) {
     })
 });
 
-
-router.get('/delete',function (request, response) {
-
-    console.log(request.query);
-
+router.get('/delete', function (request, response) {
     mongoose.model("users").findById(request.query.from, function (err, user) {
-        if (!err)
-        {
-            if (helpers.isInArray(request.query.to,user.following))
-            {
+        if (!err) {
+            if (helpers.isInArray(request.query.to, user.following)) {
                 var deletedUser = '';
-                user.following = helpers.removeItem(user.following,request.query.to);
-                user.save(function(error) {
+                user.following = helpers.removeItem(user.following, request.query.to);
+                user.save(function (error) {
                     if (error)
                         response.json({error: "error in handeling your request"});
                     response.json(user);
                 });
             }
-            else
-            {
+            else {
                 response.json({error: "You are already Un Following"});
             }
         }
@@ -62,22 +51,33 @@ router.get('/delete',function (request, response) {
     })
 });
 
-
-
-
-router.get('/list',function (request, response) {
-    mongoose.model("users").findById(request.query.user_id,{ following: 1}).populate('following').exec(function (err, following) {
-            if (err)
-                response.json({error: "Not found"});
-            else if(following.following.length == 1 &&  following.following[0] == null ) {
-                following.following.pop();
-                following.save();
-                response.json(following.following);
-            }
-            else {
-                response.json(following.following);
-            }
+router.get('/list', function (request, response) {
+    mongoose.model("users").findById(request.query.user_id, {following: 1}).populate('following').exec(function (err, following) {
+        if (err)
+            response.json({error: "Not found"});
+        else if (following.following.length == 1 && following.following[0] == null) {
+            following.following.pop();
+            following.save();
+            response.json(following.following);
+        }
+        else {
+            response.json(following.following);
+        }
     })
+});
+
+router.get("/search", function (request, response) {
+    switch (request.query.field) {
+        case "name":
+            mongoose.model("users").findById(request.query.user_id, {following: 1}).populate({ path: 'following',match: {$text: {$search: request.query.q}}}).exec(function (err, users) {
+                if (err) {
+                    response.status(400).json({error: err});
+                } else {
+                    response.json((users) ? users.following : []);
+                }
+            });
+            break;
+    }
 });
 
 module.exports = router;
