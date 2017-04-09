@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-
+var ObjectId = require('mongoose').Types.ObjectId;
 var mongoose = require("mongoose");
 var crypto = require('crypto'), shasum = crypto.createHash('sha1');
 var bodyParser = require("body-parser");
@@ -8,10 +8,10 @@ var helpers = require("../util/helpers");
 var validator = require("validator");
 var jwt = require('jsonwebtoken');
 
-router.get("/:name/list", function(request,response){
+router.get("/:id/list", function(request,response){
   console.log("list groups by user");
   console.log("prams",request.params);
-  mongoose.model("groups").find({owner:request.params.name}, function (err, groups) {
+  mongoose.model("groups").find({owner:new ObjectId(request.params.id)}, function (err, groups) {
     console.log("result groups :", groups);
       if(!err)
       {
