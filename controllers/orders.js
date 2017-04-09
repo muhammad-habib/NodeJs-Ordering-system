@@ -3,7 +3,8 @@ var router = express.Router();
 
 var config = require('../config');
 var mongoose = require("mongoose");
-
+var helpers = require("../util/helpers");//by seif
+var bodyParser = require("body-parser");//by seif
 var validator = require("validator");
 
 var multer = require('multer');
@@ -35,7 +36,20 @@ router.post("/", function (request, response) {
             }
         });
     }
-   
-});
 
+});
+//home component services
+router.get("/:id", function (request, response) {
+  mongoose.model("orders").find({owner:request.params.id}, function (err, orders) {
+    console.log("result groups :", groups);
+      if(!err)
+      {
+          response.json(groups);
+      }
+      else {
+          response.status(400).json({error: err});
+      }
+  });
+
+});
 module.exports = router;
