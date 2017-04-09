@@ -15,12 +15,13 @@ var expressJwt = require('express-jwt');
 
 var mongoose = require("mongoose");
 mongoose.connect("mongodb://iti:iti_os_37@ds155160.mlab.com:55160/iti_orders");
-
+//mongoose.connect("mongodb://localhost:27017/nodejs_project");
 
 var authRouter = require("./controllers/auth");
 var usersRouter = require("./controllers/users");
 var followRouter = require("./controllers/follow");
 var groupsRouter = require("./controllers/groups");
+var notificationsRouter = require("./controllers/notifications");
 var uploadRouter = require("./controllers/upload");
 
 fs.readdirSync(__dirname + "/models").forEach(function (file) {
@@ -44,7 +45,7 @@ expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
         '/auth/register',
         '/upload/photo',
         /\/follow\/\w*/ig,
-       '/users/list',
+       '/notification/list',
         /\/groups\/\w*/ig,
     ]
 }));
@@ -99,7 +100,7 @@ expressServer.use("/auth", authRouter);
 expressServer.use("/users", usersRouter);
 expressServer.use("/follow", followRouter);
 expressServer.use("/groups", groupsRouter);
-
+expressServer.use("/notification", notificationsRouter);
 expressServer.use("/upload", uploadRouter);
 
 httpSERVER.listen(8090);
