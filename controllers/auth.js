@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
 
-var config = require('../config');
+var fbConfig = require('../configs/fb');
 
 var mongoose = require("mongoose");
 var crypto = require('crypto'), shasum = crypto.createHash('sha1');
@@ -11,9 +11,55 @@ var jwt = require('jsonwebtoken');
 
 var multer = require('multer');
 
+var passport = require("passport");
+var FacebookStrategy = require("passport-facebook").Strategy;
+
 function sha256(msg) {
     return crypto.createHash("sha256").update(msg).digest("base64");
 }
+
+
+passport.use(new FacebookStrategy({
+  clientID        : fbConfig.appID,
+  clientSecret    : fbConfig.appSecret,
+  callbackURL     : fbConfig.callbackUrl
+},
+  function(access_token, refresh_token, profile, done) {
+    
+    console.log(profile);
+    process.nextTick(function() {
+    
+      User.findOne({ 'id' : profile.id }, function(err, user) {
+ 
+        if (err)
+          return done(err);
+ 
+          if (user) {
+            return done(null, user); 
+          } else {
+            
+            var newUser = new User();
+ 
+            
+            newUser.id    = profile.id;              
+            newUser.access_token = access_token;                     
+            newUser.name  = profile.name.givenName+' '+profile.name.familyName;
+            newUser.password ='12345';
+            newUser.email = profile.emails[0].value; 
+            
+            newUser.save(function(err) {
+              if (err)
+                throw err;
+        
+              return done(null, newUser);
+            });
+         } 
+      });
+    });
+}));
+
+
+
 
 router.post("/login", function (request, response) {
     var email = validator.escape(request.body.email);
@@ -75,5 +121,15 @@ router.post("/register", function (request, response) {
 });
 
 
+router.get("/facebook",
+  passport.authenticate('facebook')
+);
+
+
+router.get("/facebook/callback",
+  passport.authenticate('facebook',function(err,user,info){
+    console.log(user)
+  })
+);
 
 module.exports = router;
