@@ -11,6 +11,8 @@ var bodyParser = require("body-parser");
 
 var fs = require("fs");
 
+var passport = require("passport");
+
 var expressJwt = require('express-jwt');
 
 var mongoose = require("mongoose");
@@ -45,6 +47,7 @@ expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
     path: [
         '/auth/login',
         '/auth/register',
+        '/auth/facebook',
         '/upload/photo',
         /\/follow\/\w*/ig,
        '/notification/list',
