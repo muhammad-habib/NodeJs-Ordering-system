@@ -43,7 +43,6 @@ expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
         '/auth/register',
         '/upload/photo',
         /\/follow\/\w*/ig,
-        '/users/list',
         /\/groups\/\w*/ig,
     ]
 }));
