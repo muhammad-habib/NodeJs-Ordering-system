@@ -38,7 +38,7 @@ router.get("/search",function (request, response) {
             });
             break;
         case "email":
-            mongoose.model("users").find({email: request.params.q}, function (err, users) {
+            mongoose.model("users").find({email: request.query.q}, function (err, users) {
                 if(!err)
                 {
                     response.json(users);

@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-
+var config = require('../config');//by seif
 var fbConfig = require('../configs/fb');
 
 var mongoose = require("mongoose");
@@ -26,35 +26,43 @@ passport.use(new FacebookStrategy({
   callbackURL     : fbConfig.callbackUrl
 },
   function(access_token, refresh_token, profile, done) {
-    
+
     console.log(profile);
     process.nextTick(function() {
+
     
       mongoose.model("users").findOne({ 'id' : profile.id }, function(err, user) {
  
+
         if (err)
           return done(err);
- 
+
           if (user) {
-            return done(null, user); 
+            return done(null, user);
           } else {
+
             var UserModel = mongoose.model("users");
             var newUser = new UserModel()
  
             
             newUser.id    = profile.id;              
             newUser.access_token = access_token;                     
+
+
+            newUser.id    = profile.id;
+            newUser.access_token = access_token;
+
             newUser.name  = profile.name.givenName+' '+profile.name.familyName;
             newUser.password ='12345';
-            newUser.email = profile.emails[0].value; 
-            
+            newUser.email = profile.emails[0].value;
+
             newUser.save(function(err) {
               if (err)
                 throw err;
-        
+
               return done(null, newUser);
             });
-         } 
+         }
       });
     });
 }));
@@ -76,6 +84,7 @@ router.post("/login", function (request, response) {
                     name: user.name,
                     email: user.email,
                     token: jwt.sign({ sub: user._id }, config.APP_SECRET)
+
                 };
                 response.json(userData);
             }
@@ -118,7 +127,7 @@ router.post("/register", function (request, response) {
             }
         });
     }
-   
+
 });
 
 // router.get("/facebook",function(request,response){
