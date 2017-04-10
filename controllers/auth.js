@@ -25,7 +25,7 @@ router.post("/login", function (request, response) {
         mongoose.model("users").findOne({email: email}, function (err, user) {
             if (!err && user && sha256(password) === user.password) {
                 var userData = {
-                    id: user._id,
+                    _id: user._id,
                     name: user.name,
                     email: user.email,
                     token: jwt.sign({ sub: user._id }, config.APP_SECRET)
@@ -55,10 +55,10 @@ router.post("/register", function (request, response) {
                 response.status(400).json({error: "Email already in use."});
             } else {
                 var user = new UserModel({
-                    name: request.body.name,
-                    email: request.body.email,
+                    name: name,
+                    email: email,
                     avatar: request.body.avatar,
-                    password: sha256(request.body.password)
+                    password: sha256(password)
                 });
 
                 user.save(function (err) {
