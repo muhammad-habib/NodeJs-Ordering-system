@@ -9,9 +9,7 @@ var validator = require("validator");
 var jwt = require('jsonwebtoken');
 var config = require('../config');
 
-router.get('/add', function (request, response) {
-    console.log(request.usersSockets[request.query.from]);
-    request.usersSockets[request.query.to].emit("message", "dfsdfsdfdsf");
+router.get('/add',function (request, response) {
     mongoose.model("users").findById(request.query.from, function (err, user) {
 
         if (!err) {
@@ -24,6 +22,19 @@ router.get('/add', function (request, response) {
                     if (error)
                         response.json({error: "error in handeling your request"});
                     response.json(user);
+                    mongoose.model("users").findById(request.query.to, function (err, follower) {
+                        follower.notifications.push( user.name+" Follow You")
+                        follower.save(function (error) {
+                            if(error)
+                                response.json({error: "error in handeling your request"});
+                            console.log(follower);
+                        })
+                    });
+
+                    if(usersSockets[request.query.to])
+                    {
+                        usersSockets[request.query.to].emit("message",{notification: user.name+" Follow You" });
+                    }
                 });
             }
         }
