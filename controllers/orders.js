@@ -40,16 +40,30 @@ router.post("/", function (request, response) {
 });
 //home component services
 router.get("/:id", function (request, response) {
-  mongoose.model("orders").find({owner:new ObjectId(request.params.id)}, function (err, orders) {
-    console.log("result orders :", orders);
-      if(!err)
-      {
-          response.json(orders);
-      }
-      else {
-          response.status(400).json({error: err});
-      }
-  });
+  // mongoose.model("orders").find({owner:new ObjectId(request.params.id)}, function (err, orders) {
+  //   console.log("result orders :", orders);
+  //     if(!err)
+  //     {
+  //         response.json(orders);
+  //     }
+  //     else {
+  //         response.status(400).json({error: err});
+  //     }
+  // });
+
+  mongoose.model("orders").find({owner:new ObjectId(request.params.id)}).populate("owner").exec(function (err, orders) {
+    console.log("prams",request.params);
+           if (err){
+              response.json({error: "Not found"});
+              console.log("error in list orders");
+            }
+
+
+           else {
+               response.json(orders);
+               console.log("orders :",orders);
+           }
+  })
 
 });
 module.exports = router;
