@@ -18,22 +18,19 @@ function sha256(msg) {
     return crypto.createHash("sha256").update(msg).digest("base64");
 }
 
-passport.authenticate("facebook");
 
 passport.use(new FacebookStrategy({
   clientID        : fbConfig.appID,
   clientSecret    : fbConfig.appSecret,
-  callbackURL     : fbConfig.callbackUrl
+  callbackURL     : fbConfig.callbackUrl,
+  profileFields: ['id', 'displayName', 'photos', 'email']
 },
   function(access_token, refresh_token, profile, done) {
 
-    console.log(profile);
     process.nextTick(function() {
 
-    
       mongoose.model("users").findOne({ 'id' : profile.id }, function(err, user) {
  
-
         if (err)
           return done(err);
 
@@ -43,19 +40,12 @@ passport.use(new FacebookStrategy({
 
             var UserModel = mongoose.model("users");
             var newUser = new UserModel()
- 
-            
             newUser.id    = profile.id;              
             newUser.access_token = access_token;                     
-
-
-            newUser.id    = profile.id;
-            newUser.access_token = access_token;
-
-            newUser.name  = profile.name.givenName+' '+profile.name.familyName;
-            newUser.password ='12345';
+            newUser.name  = profile.displayName;
+            newUser.password ='123456';
             newUser.email = profile.emails[0].value;
-
+            
             newUser.save(function(err) {
               if (err)
                 throw err;
@@ -68,6 +58,13 @@ passport.use(new FacebookStrategy({
 }));
 
 
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
 
 
 router.post("/login", function (request, response) {
@@ -130,10 +127,6 @@ router.post("/register", function (request, response) {
 
 });
 
-// router.get("/facebook",function(request,response){
-//   passport.authenticate('facebook');
-// });
-
 router.get("/facebook",
   passport.authenticate('facebook')
 );
@@ -141,10 +134,11 @@ router.get("/facebook",
 
 router.get('/facebook/callback',
   passport.authenticate('facebook', {
-    successRedirect : '/login',
-    failureRedirect : '/register'
+    successRedirect : '/home',
+    failureRedirect : '/auth/login'
   })
 
 );
 
 module.exports = router;
+//mongo ds155160.mlab.com:55160/iti_orders -u iti -p iti_os_37

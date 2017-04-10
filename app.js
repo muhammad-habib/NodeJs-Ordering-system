@@ -49,6 +49,7 @@ expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
         '/auth/register',
         '/auth/facebook',
         '/auth/facebook/callback',
+         '/home',
         '/upload/photo',
         /\/follow\/\w*/ig,
        '/notification/list',
@@ -79,7 +80,8 @@ io.on('connection', function(socket){
 
 expressServer.use(bodyParser.urlencoded({extended: false}));
 expressServer.use(bodyParser.json());
-
+expressServer.use(passport.initialize());
+expressServer.use(passport.session());
 expressServer.use("/auth", authRouter);
 expressServer.use("/users", usersRouter);
 expressServer.use("/follow", followRouter);
