@@ -18,6 +18,7 @@ function sha256(msg) {
     return crypto.createHash("sha256").update(msg).digest("base64");
 }
 
+passport.authenticate("facebook");
 
 passport.use(new FacebookStrategy({
   clientID        : fbConfig.appID,
@@ -29,7 +30,7 @@ passport.use(new FacebookStrategy({
     console.log(profile);
     process.nextTick(function() {
     
-      User.findOne({ 'id' : profile.id }, function(err, user) {
+      mongoose.model("users").findOne({ 'id' : profile.id }, function(err, user) {
  
         if (err)
           return done(err);
@@ -37,8 +38,8 @@ passport.use(new FacebookStrategy({
           if (user) {
             return done(null, user); 
           } else {
-            
-            var newUser = new User();
+            var UserModel = mongoose.model("users");
+            var newUser = new UserModel()
  
             
             newUser.id    = profile.id;              
@@ -120,16 +121,21 @@ router.post("/register", function (request, response) {
    
 });
 
+// router.get("/facebook",function(request,response){
+//   passport.authenticate('facebook');
+// });
 
 router.get("/facebook",
   passport.authenticate('facebook')
 );
 
 
-router.get("/facebook/callback",
-  passport.authenticate('facebook',function(err,user,info){
-    console.log(user)
+router.get('/facebook/callback',
+  passport.authenticate('facebook', {
+    successRedirect : '/login',
+    failureRedirect : '/register'
   })
+
 );
 
 module.exports = router;

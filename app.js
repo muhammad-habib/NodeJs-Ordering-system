@@ -44,6 +44,7 @@ expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
         '/auth/login',
         '/auth/register',
         '/auth/facebook',
+        '/auth/facebook/callback',
         '/upload/photo',
         /\/follow\/\w*/ig,
         '/users/list',
