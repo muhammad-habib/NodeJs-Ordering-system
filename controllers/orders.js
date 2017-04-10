@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-
+var ObjectId = require('mongoose').Types.ObjectId;//by seif
 var config = require('../config');
 var mongoose = require("mongoose");
 var helpers = require("../util/helpers");//by seif
@@ -40,11 +40,11 @@ router.post("/", function (request, response) {
 });
 //home component services
 router.get("/:id", function (request, response) {
-  mongoose.model("orders").find({owner:request.params.id}, function (err, orders) {
-    console.log("result groups :", groups);
+  mongoose.model("orders").find({owner:new ObjectId(request.params.id)}, function (err, orders) {
+    console.log("result orders :", orders);
       if(!err)
       {
-          response.json(groups);
+          response.json(orders);
       }
       else {
           response.status(400).json({error: err});
