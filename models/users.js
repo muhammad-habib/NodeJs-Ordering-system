@@ -8,6 +8,7 @@ var users = new Schema({
     password: {type: String, required: true},
     online: {type: Boolean, default: false},
     avatar: String,
+    notifications:[],
     access_token: String,
     following: [{type: Schema.ObjectId, ref: "users"}]
 });

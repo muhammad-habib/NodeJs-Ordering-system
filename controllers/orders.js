@@ -30,7 +30,7 @@ router.post("/", function (request, response) {
 
         order.save(function (err) {
             if (!err) {
-                response.json({"status": "done"})
+                response.json(order)
             } else {
                 response.status(400).json({error: "Insert Failed."});
             }
