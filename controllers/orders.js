@@ -10,6 +10,22 @@ var validator = require("validator");
 
 var multer = require('multer');
 
+router.get("/", function (request, response) {
+    switch (request.query.field) {
+        case "owner":
+            mongoose.model("orders").find({owner: new ObjectId(request.query.owner)}).limit(10).populate("owner").exec(function (err, orders) {
+                if (err) {
+                    response.json({error: "Not found"});
+                    console.log("error in list orders");
+                } else {
+                    response.json(orders);
+                    console.log("orders :", orders);
+                }
+            });
+            break;
+    }
+});
+
 router.post("/", function (request, response) {
 
     var OrderModel = mongoose.model("orders");
@@ -39,34 +55,14 @@ router.post("/", function (request, response) {
     }
 
 });
-//home component services
+
 router.get("/:id", function (request, response) {
-  //get order info only
-  // mongoose.model("orders").find({owner:new ObjectId(request.params.id)}, function (err, orders) {
-  //   console.log("result orders :", orders);
-  //     if(!err)
-  //     {
-  //         response.json(orders);
-  //     }
-  //     else {
-  //         response.status(400).json({error: err});
-  //     }
-  // });
-  //get user info in addition
-  mongoose.model("orders").find({owner:new ObjectId(request.params.id)}).limit(10).populate("owner").exec(function (err, orders) {
-    console.log("prams",request.params);
-           if (err){
-              response.json({error: "Not found"});
-              console.log("error in list orders");
-            }
-            else {
-               response.json(orders);
-               console.log("orders :",orders);
-           }
-  })
 
 });
 
+router.post("/:id/meals/", function (request, response) {
+
+});
 
 router.get("/:id/friends", function (request, response) {
   var friendsArr=[];
