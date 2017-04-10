@@ -42,7 +42,7 @@ router.post("/", function (request, response) {
             restaurant_name: restaurant_name,
             photo: photo,
             owner : request.body.owner,
-            invited : request.body.invited,
+            invited : request.body.invited
         });
 
         order.save(function (err) {
@@ -57,7 +57,13 @@ router.post("/", function (request, response) {
 });
 
 router.get("/:id", function (request, response) {
-
+    mongoose.model("orders").findOne({_id : request.params.id}).populate("owner").populate("meals").populate("invited").exec(function (err, order) {
+        if (err) {
+            response.status(400).json({error: err});
+        }else{
+            response.json(order);
+        }
+    })
 });
 
 router.post("/:id/meals/", function (request, response) {

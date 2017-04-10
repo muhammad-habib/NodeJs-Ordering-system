@@ -43,20 +43,21 @@ expressServer.use(function (req, res, next) {
 
 expressServer.use(express.static('public'));
 
-expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
-    path: [
-        '/auth/login',
-        '/auth/register',
-        '/auth/facebook',
-        '/auth/facebook/callback',
-        '/home',
-        '/upload/photo',
-        /\/follow\/\w*/ig,
-        '/notification/list',
-        '/users/list',
-        /\/groups\/\w*/ig,
-    ]
-}));
+
+// expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
+//     path: [
+//         '/auth/login',
+//         '/auth/register',
+//         '/auth/facebook',
+//         '/auth/facebook/callback',
+//         '/home',
+//         '/upload/photo',
+//         /\/follow\/\w*/ig,
+//         '/notification/list',
+//         '/users/list',
+//         /\/groups\/\w*/ig,
+//     ]
+// }));
 
 
 io.on('connection', function (socket) {
