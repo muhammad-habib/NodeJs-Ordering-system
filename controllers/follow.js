@@ -33,7 +33,11 @@ router.get('/add',function (request, response) {
 
                     if(usersSockets[request.query.to])
                     {
-                        usersSockets[request.query.to].emit("message",{notification: user.name+" Follow You" });
+                        var userObj = {};
+                        userObj['name'] = user.name;
+                        userObj['body'] = user.name+" Follow You";
+                        userObj['avatar'] = user.avatar;
+                        usersSockets[request.query.to].emit("message",{notification: userObj});
                     }
                 });
             }
