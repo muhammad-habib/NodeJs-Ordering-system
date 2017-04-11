@@ -11,6 +11,8 @@ var validator = require("validator");
 var multer = require('multer');
 
 router.get("/", function (request, response) {
+    console.log("q :",request.query);
+    //var array = string.split(',');
     switch (request.query.field) {
         case "owner":
             mongoose.model("orders").find({owner: new ObjectId(request.query.owner)}).limit(10).populate("owner").exec(function (err, orders) {
