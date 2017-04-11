@@ -52,34 +52,4 @@ router.get("/search",function (request, response) {
     //response.status(400).json({error: "Nothing Found"});
 });
 
-//users/search?field=name&q=Moustafa
-//users/search?field=email&q=Moustafa@gmail.com
-router.get("/search",function (request, response) {
-    switch (request.query.field) {
-        case "name":
-            mongoose.model("users").find({$text: {$search: request.query.q}},function (err, users) {
-                if(!err)
-                {
-                    response.json(users);
-                }
-                else {
-                    response.status(400).json({error: err});
-                }
-            });
-            break;
-        case "email":
-            mongoose.model("users").find({email: request.params.q}, function (err, users) {
-                if(!err)
-                {
-                    response.json(users);
-                }
-                else {
-                    response.status(400).json({error: err});
-                }
-            });
-            break;
-    }
-    //response.status(400).json({error: "Nothing Found"});
-});
-
 module.exports = router;

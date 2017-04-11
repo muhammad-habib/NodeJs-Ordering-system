@@ -42,42 +42,46 @@ expressServer.use(function (req, res, next) {
 
 expressServer.use(express.static('public'));
 
-expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
-    path: [
-        '/auth/login',
-        '/auth/register',
-        '/auth/facebook',
-        '/upload/photo',
-        /\/follow\/\w*/ig,
-       '/notification/list',
-        '/users/list',
-        /\/groups\/\w*/ig,
-    ]
-}));
+
+// expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
+//     path: [
+//         '/auth/login',
+//         '/auth/register',
+//         '/auth/facebook',
+//         '/auth/facebook/callback',
+//         '/home',
+//         '/upload/photo',
+//         /\/follow\/\w*/ig,
+//         '/notification/list',
+//         '/users/list',
+//         /\/groups\/\w*/ig,
+//     ]
+// }));
 
 
-io.on('connection', function(socket){
+io.on('connection', function (socket) {
     socket.on('disconnect', function () {
         delete usersSockets[socket.clientId];
     });
 
-    socket.on('add-message', function(obj) {
+    socket.on('add-message', function (obj) {
         io.emit('message', {type: 'new-message', text: obj});
     });
 
-    socket.on('login-message', function(obj) {
+    socket.on('login-message', function (obj) {
         socket.clientId = obj.user_id;
         usersSockets[obj.user_id] = socket;
     });
 
-    socket.on('logout-message', function(obj) {
+    socket.on('logout-message', function (obj) {
         delete usersSockets[socket.clientId];
-    });
+    })
 });
 
 expressServer.use(bodyParser.urlencoded({extended: false}));
 expressServer.use(bodyParser.json());
-
+expressServer.use(passport.initialize());
+expressServer.use(passport.session());
 expressServer.use("/auth", authRouter);
 expressServer.use("/users", usersRouter);
 expressServer.use("/follow", followRouter);

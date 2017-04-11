@@ -7,4 +7,6 @@ var groups = new Schema({
     members: [{type: Schema.ObjectId, ref: "users"}]
 })
 
+groups.index({name: 'text'});
+
 mongoose.model("groups", groups);

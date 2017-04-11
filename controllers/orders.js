@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
-
+var ObjectId = require('mongoose').Types.ObjectId;//by seif
+//var forEach = require('async-foreach').forEach;//by seif
 var config = require('../config');
 var mongoose = require("mongoose");
 var helpers = require("../util/helpers");//by seif
@@ -8,6 +9,22 @@ var bodyParser = require("body-parser");//by seif
 var validator = require("validator");
 
 var multer = require('multer');
+
+router.get("/", function (request, response) {
+    switch (request.query.field) {
+        case "owner":
+            mongoose.model("orders").find({owner: new ObjectId(request.query.owner)}).limit(10).populate("owner").exec(function (err, orders) {
+                if (err) {
+                    response.json({error: "Not found"});
+                    console.log("error in list orders");
+                } else {
+                    response.json(orders);
+                    console.log("orders :", orders);
+                }
+            });
+            break;
+    }
+});
 
 router.post("/", function (request, response) {
 
@@ -25,7 +42,7 @@ router.post("/", function (request, response) {
             restaurant_name: restaurant_name,
             photo: photo,
             owner : request.body.owner,
-            invited : request.body.invited,
+            invited : request.body.invited
         });
 
         order.save(function (err) {
@@ -38,18 +55,35 @@ router.post("/", function (request, response) {
     }
 
 });
-//home component services
-router.get("/:id", function (request, response) {
-  mongoose.model("orders").find({owner:request.params.id}, function (err, orders) {
-    console.log("result groups :", groups);
-      if(!err)
-      {
-          response.json(groups);
-      }
-      else {
-          response.status(400).json({error: err});
-      }
-  });
 
+router.get("/:id", function (request, response) {
+    mongoose.model("orders").findOne({_id : request.params.id}).populate("owner").populate("meals").populate("invited").exec(function (err, order) {
+        if (err) {
+            response.status(400).json({error: err});
+        }else{
+            response.json(order);
+        }
+    })
+});
+
+router.post("/:id/meals/", function (request, response) {
+
+});
+
+router.get("/:id/friends", function (request, response) {
+  var friendsArr=[];
+  var friendsOrdersArr=[];
+  //get friends
+  mongoose.model("users").find({_id:new ObjectId(request.params.id)},{_id:0, following: 1}).populate("following").exec(function (err, friends) {
+    console.log("prams",request.params);
+           if (err){
+              response.json({error: "Not found"});
+              console.log("error in list friends");
+            }
+            else {
+
+
+           }
+  })
 });
 module.exports = router;

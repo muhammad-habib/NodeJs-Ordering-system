@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-
+var config = require('../config');//by seif
 var fbConfig = require('../configs/fb');
 
 var mongoose = require("mongoose");
@@ -22,43 +22,49 @@ function sha256(msg) {
 passport.use(new FacebookStrategy({
   clientID        : fbConfig.appID,
   clientSecret    : fbConfig.appSecret,
-  callbackURL     : fbConfig.callbackUrl
+  callbackURL     : fbConfig.callbackUrl,
+  profileFields: ['id', 'displayName', 'photos', 'email']
 },
   function(access_token, refresh_token, profile, done) {
-    
-    console.log(profile);
+
     process.nextTick(function() {
-    
-      User.findOne({ 'id' : profile.id }, function(err, user) {
+
+      mongoose.model("users").findOne({ 'id' : profile.id }, function(err, user) {
  
         if (err)
           return done(err);
- 
+
           if (user) {
-            return done(null, user); 
+            return done(null, user);
           } else {
-            
-            var newUser = new User();
- 
-            
+
+            var UserModel = mongoose.model("users");
+            var newUser = new UserModel()
             newUser.id    = profile.id;              
             newUser.access_token = access_token;                     
-            newUser.name  = profile.name.givenName+' '+profile.name.familyName;
-            newUser.password ='12345';
-            newUser.email = profile.emails[0].value; 
+            newUser.name  = profile.displayName;
+            newUser.password ='123456';
+            newUser.email = profile.emails[0].value;
             
             newUser.save(function(err) {
               if (err)
                 throw err;
-        
+
               return done(null, newUser);
             });
-         } 
+         }
       });
     });
 }));
 
 
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
 
 
 router.post("/login", function (request, response) {
@@ -75,6 +81,7 @@ router.post("/login", function (request, response) {
                     name: user.name,
                     email: user.email,
                     token: jwt.sign({ sub: user._id }, config.APP_SECRET)
+
                 };
                 response.json(userData);
             }
@@ -117,19 +124,21 @@ router.post("/register", function (request, response) {
             }
         });
     }
-   
-});
 
+});
 
 router.get("/facebook",
   passport.authenticate('facebook')
 );
 
 
-router.get("/facebook/callback",
-  passport.authenticate('facebook',function(err,user,info){
-    console.log(user)
+router.get('/facebook/callback',
+  passport.authenticate('facebook', {
+    successRedirect : '/home',
+    failureRedirect : '/auth/login'
   })
+
 );
 
 module.exports = router;
+//mongo ds155160.mlab.com:55160/iti_orders -u iti -p iti_os_37
