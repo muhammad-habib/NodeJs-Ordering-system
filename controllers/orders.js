@@ -11,11 +11,24 @@ var validator = require("validator");
 var multer = require('multer');
 
 router.get("/", function (request, response) {
-    console.log("q :",request.query);
+    console.log("q :",request.query.field);
     //var array = string.split(',');
     switch (request.query.field) {
         case "owner":
             mongoose.model("orders").find({owner: new ObjectId(request.query.owner)}).limit(10).populate("owner").exec(function (err, orders) {
+                if (err) {
+                    response.json({error: "Not found"});
+                    console.log("error in list orders");
+                } else {
+                    response.json(orders);
+                    console.log("orders :", orders);
+                }
+            });
+            break;
+        case "owners":
+        console.log(request.query.owners.split(','));
+        var ids=request.query.owners.split(',');
+            mongoose.model("orders").find({owner:{$in: ids.map(function(id){ return mongoose.Types.ObjectId(id); })}}).limit(1).populate("owner").exec(function (err, orders) {
                 if (err) {
                     response.json({error: "Not found"});
                     console.log("error in list orders");
