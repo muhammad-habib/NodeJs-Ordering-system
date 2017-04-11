@@ -1,7 +1,7 @@
 var express = require('express');
 var expressServer = express();
 
-var config = require('./config');
+ config = require('./config');
 
 var http = require('http');
 var httpSERVER = http.createServer(expressServer);
@@ -19,7 +19,6 @@ var mongoose = require("mongoose");
 mongoose.connect("mongodb://iti:iti_os_37@ds155160.mlab.com:55160/iti_orders");
 
 //mongoose.connect("mongodb://localhost:27017/nodejs_project");
-
 
 var authRouter = require("./controllers/auth");
 var usersRouter = require("./controllers/users");
@@ -43,20 +42,21 @@ expressServer.use(function (req, res, next) {
 
 expressServer.use(express.static('public'));
 
-expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
-    path: [
-        '/auth/login',
-        '/auth/register',
-        '/auth/facebook',
-        '/auth/facebook/callback',
-        '/home',
-        '/upload/photo',
-        /\/follow\/\w*/ig,
-        '/notification/list',
-        '/users/list',
-        /\/groups\/\w*/ig,
-    ]
-}));
+
+// expressServer.use(expressJwt({secret: config.APP_SECRET}).unless({
+//     path: [
+//         '/auth/login',
+//         '/auth/register',
+//         '/auth/facebook',
+//         '/auth/facebook/callback',
+//         '/home',
+//         '/upload/photo',
+//         /\/follow\/\w*/ig,
+//         '/notification/list',
+//         '/users/list',
+//         /\/groups\/\w*/ig,
+//     ]
+// }));
 
 
 io.on('connection', function (socket) {
