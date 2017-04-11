@@ -8,9 +8,25 @@ var validator = require("validator");
 var jwt = require('jsonwebtoken');
 
 
+router.get('/status',function (request, response) {
+
+    mongoose.model("users").findById(request.query.user_id,function (err, user) {
+        if (!err)
+        {
+        	user.read_notification = true;
+        	user.save(function (error) {
+                    if (error)
+                        response.json({error: "error in handeling your request"});
+                    response.json({mission:true});
+                });
+        }
+    })
+});
+
+
 router.get('/list',function (request, response) {
 
-    mongoose.model("users").findById(request.query.user_id,{notifications: 1},function (err, notifications) {
+    mongoose.model("users").findById(request.query.user_id,{notifications: 1,read_notification: 1},function (err, notifications) {
         if (!err)
         {
             console.log(notifications);
@@ -18,5 +34,7 @@ router.get('/list',function (request, response) {
         }
     })
 });
+
+
 
 module.exports = router;
