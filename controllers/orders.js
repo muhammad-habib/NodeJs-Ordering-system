@@ -51,13 +51,13 @@ router.post("/", function (request, response) {
 
     if (validator.isEmpty(order_for) || validator.isEmpty(restaurant_name) || validator.isEmpty(photo)) {
         response.status(400).json({error: "Please Fill All The Fields"});
-    }else{
+    } else {
         var order = new OrderModel({
             order_for: order_for,
             restaurant_name: restaurant_name,
             photo: photo,
-            owner : request.body.owner,
-            invited : request.body.invited
+            owner: request.body.owner,
+            invited: request.body.invited
         });
 
         order.save(function (err) {
@@ -71,34 +71,57 @@ router.post("/", function (request, response) {
 
 });
 
-router.get("/:id", function (request, response) {
-    mongoose.model("orders").findOne({_id : request.params.id}).populate("owner").populate("meals").populate("invited").exec(function (err, order) {
+router.get("/:order", function (request, response) {
+    mongoose.model("orders").findOne({_id: request.params.order}).deepPopulate('owner meals.owner invited').exec(function (err, order) {
         if (err) {
             response.status(400).json({error: err});
-        }else{
+        } else {
             response.json(order);
         }
     })
 });
 
-router.post("/:id/meals/", function (request, response) {
+router.post("/:order/meals/", function (request, response) {
+    mongoose.model("orders").update(
+        {"_id": request.params.order},
+        {"$push": {"meals": request.body}},
+        function (err, numAffected) {
+            if (err) {
+                response.status(400).json({error: err});
+            } else {
+                response.json(request.body);
+            }
+        }
+    );
+});
 
+router.delete("/:order/meals/:meal", function (request, response) {
+    mongoose.model("orders").update({_id: request.params.order}, {$pull: {meals : {_id: request.params.meal}}}, function (err, numAffected) {
+        if (err) {
+            response.status(400).json({error: err});
+        } else {
+            response.json(request.params);
+        }
+    });
 });
 
 router.get("/:id/friends", function (request, response) {
-  var friendsArr=[];
-  var friendsOrdersArr=[];
-  //get friends
-  mongoose.model("users").find({_id:new ObjectId(request.params.id)},{_id:0, following: 1}).populate("following").exec(function (err, friends) {
-    console.log("prams",request.params);
-           if (err){
-              response.json({error: "Not found"});
-              console.log("error in list friends");
-            }
-            else {
+    var friendsArr = [];
+    var friendsOrdersArr = [];
+    //get friends
+    mongoose.model("users").find({_id: new ObjectId(request.params.id)}, {
+        _id: 0,
+        following: 1
+    }).populate("following").exec(function (err, friends) {
+        console.log("prams", request.params);
+        if (err) {
+            response.json({error: "Not found"});
+            console.log("error in list friends");
+        }
+        else {
 
 
-           }
-  })
+        }
+    })
 });
 module.exports = router;

@@ -1,5 +1,8 @@
 var mongoose = require("mongoose");
+var deepPopulate = require('mongoose-deep-populate')(mongoose);
+
 var Schema = mongoose.Schema;
+
 
 var orders = new Schema({
     order_for: {type: String, required: true},
@@ -14,3 +17,4 @@ var orders = new Schema({
 });
 
 mongoose.model("orders", orders);
+orders.plugin(deepPopulate);
