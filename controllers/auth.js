@@ -130,14 +130,15 @@ router.post("/register", function (request, response) {
 router.post("/facebook",function(request,response){
   var UserModel = mongoose.model("users");
   var name=request.body.userID;
-  UserModel.find({name: name}, function (err, users) {
+  
+  UserModel.findOne({name: name}, function (err, user) {
    
-    if (users.length) {
+    if (user) {
             var userData = {
-                    _id: users[0].name,
-                    name: user[0].name,
-                    email: users[0].name,
-                    token: jwt.sign({ sub: users[0]._id }, config.APP_SECRET)
+                    _id: user._id,
+                    name: user.name,
+                    email: user.name,
+                    token: jwt.sign({ sub: user._id }, config.APP_SECRET)
 
                 };
                 console.log("user logged using fb") ; 
@@ -154,7 +155,7 @@ router.post("/facebook",function(request,response){
             user.save(function (err) {
                 if (!err) {
                   var userData = {
-                     _id: user.name,
+                     _id: user._id,
                      name: user.name,
                      email: user.name,
                      token: jwt.sign({ sub: user._id }, config.APP_SECRET)
