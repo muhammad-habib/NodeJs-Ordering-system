@@ -29,7 +29,7 @@ router.get("/members/add", function (request, response) {
         }
 
     })
-    
+
 });
 
 router.post("/add", bodyParser.urlencoded({extended: false}), function (request, response) {
@@ -82,13 +82,14 @@ router.get("/:id/list", function (request, response) {
             response.status(400).json({error: err});
         }
     });
-    //response.json({g1:{name:"OS",id:2},g2:{name:"java",id:3}});
+
 
 });
 
-router.get("/:name/members", function (request, response) {
+router.get("/:id/members", function (request, response) {
     console.log("list members");
-    mongoose.model("groups").findOne({name: request.params.name}, {
+    console.log("params:",request.params.id)
+    mongoose.model("groups").findOne({_id: new ObjectId(request.params.id)}, {
         _id: 0,
         members: 1
     }).populate("members").exec(function (err, members) {
@@ -101,21 +102,43 @@ router.get("/:name/members", function (request, response) {
             console.log("members :", members);
         }
     })
-
-    // mongoose.model("groups").findOne({name:request.params.name},{_id:0, members: 1}).populate("members").exec(function (err, members) {
-    //   console.log("prams",request.params);
-    //          if (err){
-    //             response.json({error: "Not found"});
-    //             console.log("error in list members");
-    //           }
-    //
-    //          else {
-    //              response.json(members);
-    //              console.log("members :",members);
-    //          }
-    // })
-
-
 });
+
+
+router.delete("/:gid/members/:uid", function (request, response) {
+  console.log("delete member");
+    mongoose.model("groups").findById(request.params.gid, function (err, group) {
+        if (!err) {
+            if (helpers.isInArray(request.params.uid, group.members)) {
+                var deletedUser = '';
+                group.members = helpers.removeItem(group.members, request.params.uid);
+                group.save(function (error) {
+                    if (error)
+                        response.json({error: "error in deleting members"});
+                    response.json(group);
+                });
+            }
+            else {
+                response.json({error: "member not exists"});
+            }
+        }
+
+    })
+});
+router.delete("/:gid", function (request, response) {
+  console.log("delete member");
+    mongoose.model("groups").remove({"_id":request.params.gid}, function (err, data) {
+        if (!err) {
+          response.json("group deleted sucessfuly")
+          console.log("group deleted sucessfuly")
+        }
+        else {
+          response.json("group not deleted ")
+          console.log("group not deleted")
+        }
+
+    })
+});
+
 
 module.exports = router;
