@@ -26,23 +26,27 @@ router.get("/", function (request, response) {
             });
             break;
         case "owners":
-            console.log(request.query.owners.split(','));
-            var ids = request.query.owners.split(',');
-            mongoose.model("orders").find({
-                owner: {
-                    $in: ids.map(function (id) {
-                        return mongoose.Types.ObjectId(id);
-                    })
-                }
-            }).limit(1).populate("owner").exec(function (err, orders) {
-                if (err) {
-                    response.json({error: "Not found"});
-                    console.log("error in list orders");
-                } else {
-                    response.json(orders);
-                    console.log("orders :", orders);
-                }
-            });
+
+            if (request.query.owners != "") {
+                console.log(request.query.owners.split(','));
+                var ids = request.query.owners.split(',');
+                mongoose.model("orders").find({
+                    owner: {
+                        $in: ids.map(function (id) {
+                            return mongoose.Types.ObjectId(id);
+                        })
+                    }
+                }).limit(1).populate("owner").exec(function (err, orders) {
+                    if (err) {
+                        response.json({error: "Not found"});
+                        console.log("error in list orders");
+                    } else {
+                        response.json(orders);
+                        console.log("orders :", orders);
+                    }
+                });
+            }
+
             break;
     }
 });
@@ -118,21 +122,21 @@ router.delete("/:order/users/:user", function (request, response) {
 
                 for (var i = 0; i < order.invited.length; i++) {
                     if (order.invited[i].toString() == request.params.user) {
-                        order.invited.splice(i,1);
+                        order.invited.splice(i, 1);
                     }
                 }
 
                 var j = order.meals.length;
-                while (j--){
+                while (j--) {
                     if (order.meals[j].owner.toString() == request.params.user) {
-                        order.meals.splice(j,1);
+                        order.meals.splice(j, 1);
                     }
                 }
 
                 order.save(function (error) {
-                    if (error){
+                    if (error) {
                         response.json({error: "error in handeling your request"});
-                    }else{
+                    } else {
                         response.json(order);
                     }
                 });

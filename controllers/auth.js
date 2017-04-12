@@ -128,16 +128,20 @@ router.post("/register", function (request, response) {
 });
 
 router.post("/facebook",function(request,response){
+  console.log(request.body)
   var UserModel = mongoose.model("users");
-  var name=request.body.userID;
-  
-  UserModel.findOne({name: name}, function (err, user) {
+  var fb_id = request.body.facebookID;
+  var name = request.body.name;
+  var email = request.body.email;
+  var avatar = request.body.avatar;
+  UserModel.findOne({facebookID: fb_id}, function (err, user) {
    
     if (user) {
             var userData = {
                     _id: user._id,
                     name: user.name,
-                    email: user.name,
+                    email: user.email,
+                    avatar : user.avatar,
                     token: jwt.sign({ sub: user._id }, config.APP_SECRET)
 
                 };
@@ -146,9 +150,10 @@ router.post("/facebook",function(request,response){
         }
     else{
            var user = new UserModel({
+                        facebookID : fb_id,
                         name: name,
-                        email: 't@t.com',
-                        avatar: name,
+                        email: email,
+                        avatar: avatar,
                         password: '111'
                          });
 
@@ -157,7 +162,8 @@ router.post("/facebook",function(request,response){
                   var userData = {
                      _id: user._id,
                      name: user.name,
-                     email: user.name,
+                     email: user.email,
+                     avatar : user.avatar,
                      token: jwt.sign({ sub: user._id }, config.APP_SECRET)
 
                           };
