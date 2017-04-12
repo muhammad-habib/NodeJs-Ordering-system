@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var config = require('../config');//by seif
-var fbConfig = require('../configs/fb');
+// var fbConfig = require('../configs/fb');
 
 var mongoose = require("mongoose");
 var crypto = require('crypto'), shasum = crypto.createHash('sha1');
@@ -11,60 +11,60 @@ var jwt = require('jsonwebtoken');
 
 var multer = require('multer');
 
-var passport = require("passport");
-var FacebookStrategy = require("passport-facebook").Strategy;
+// var passport = require("passport");
+// var FacebookStrategy = require("passport-facebook").Strategy;
 
 function sha256(msg) {
     return crypto.createHash("sha256").update(msg).digest("base64");
 }
 
 
-passport.use(new FacebookStrategy({
-  clientID        : fbConfig.appID,
-  clientSecret    : fbConfig.appSecret,
-  callbackURL     : fbConfig.callbackUrl,
-  profileFields: ['id', 'displayName', 'photos', 'email']
-},
-  function(access_token, refresh_token, profile, done) {
+// passport.use(new FacebookStrategy({
+//   clientID        : fbConfig.appID,
+//   clientSecret    : fbConfig.appSecret,
+//   callbackURL     : fbConfig.callbackUrl,
+//   profileFields: ['id', 'displayName', 'photos', 'email']
+// },
+//   function(access_token, refresh_token, profile, done) {
 
-    process.nextTick(function() {
+//     process.nextTick(function() {
 
-      mongoose.model("users").findOne({ 'id' : profile.id }, function(err, user) {
+//       mongoose.model("users").findOne({ 'id' : profile.id }, function(err, user) {
  
-        if (err)
-          return done(err);
+//         if (err)
+//           return done(err);
 
-          if (user) {
-            return done(null, user);
-          } else {
+//           if (user) {
+//             return done(null, user);
+//           } else {
 
-            var UserModel = mongoose.model("users");
-            var newUser = new UserModel()
-            newUser.id    = profile.id;              
-            newUser.access_token = access_token;                     
-            newUser.name  = profile.displayName;
-            newUser.password ='123456';
-            newUser.email = profile.emails[0].value;
+//             var UserModel = mongoose.model("users");
+//             var newUser = new UserModel()
+//             newUser.id    = profile.id;              
+//             newUser.access_token = access_token;                     
+//             newUser.name  = profile.displayName;
+//             newUser.password ='123456';
+//             newUser.email = profile.emails[0].value;
             
-            newUser.save(function(err) {
-              if (err)
-                throw err;
+//             newUser.save(function(err) {
+//               if (err)
+//                 throw err;
 
-              return done(null, newUser);
-            });
-         }
-      });
-    });
-}));
+//               return done(null, newUser);
+//             });
+//          }
+//       });
+//     });
+// }));
 
 
-passport.serializeUser(function(user, done) {
-  done(null, user);
-});
+// passport.serializeUser(function(user, done) {
+//   done(null, user);
+// });
 
-passport.deserializeUser(function(user, done) {
-  done(null, user);
-});
+// passport.deserializeUser(function(user, done) {
+//   done(null, user);
+// });
 
 
 router.post("/login", function (request, response) {
@@ -127,18 +127,62 @@ router.post("/register", function (request, response) {
 
 });
 
-router.get("/facebook",
-  passport.authenticate('facebook')
-);
+router.post("/facebook",function(request,response){
+  var UserModel = mongoose.model("users");
+  var name=request.body.userID;
+  UserModel.find({name: name}, function (err, users) {
+   
+    if (users.length) {
+            var userData = {
+                    _id: users[0].name,
+                    name: user[0].name,
+                    email: users[0].name,
+                    token: jwt.sign({ sub: users[0]._id }, config.APP_SECRET)
+
+                };
+                console.log("user logged using fb") ; 
+                response.json(userData);
+        }
+    else{
+           var user = new UserModel({
+                        name: name,
+                        email: 't@t.com',
+                        avatar: name,
+                        password: '111'
+                         });
+
+            user.save(function (err) {
+                if (!err) {
+                  var userData = {
+                     _id: user.name,
+                     name: user.name,
+                     email: user.name,
+                     token: jwt.sign({ sub: user._id }, config.APP_SECRET)
+
+                          };
+                     console.log("user registered using fb") ;    
+                  response.json(userData);
+               } else {
+               response.status(400).json({error: "Registeration Failed"});
+                      }
+            });            
+             
+      }
+ });
+});
+// router.get("/facebook",
+//   passport.authenticate('facebook')
+// );
 
 
-router.get('/facebook/callback',
-  passport.authenticate('facebook', {
-    successRedirect : '/home',
-    failureRedirect : '/auth/login'
-  })
+// router.get('/facebook/callback',
+//   passport.authenticate('facebook', {
+//     successRedirect : '/home',
+//     failureRedirect : '/auth/login'
+//   })
 
-);
+// );
+
 
 module.exports = router;
 //mongo ds155160.mlab.com:55160/iti_orders -u iti -p iti_os_37
