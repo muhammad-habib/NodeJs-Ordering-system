@@ -81,6 +81,24 @@ router.get('/list', function (request, response) {
     })
 });
 
+
+
+router.get('/list/followers', function (request, response) {
+    mongoose.model("users").find({following:request.query.user_id}, function (err, users) {
+
+        if (!err) {
+            response.json(users);
+        }
+        else{
+            response.status(400).json({error: err});
+        }
+
+    })
+});
+
+
+
+
 router.get("/search", function (request, response) {
     switch (request.query.field) {
         case "name":
