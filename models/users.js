@@ -7,6 +7,7 @@ var users = new Schema({
     email: {type: String, required: true},
     password: {type: String, required: true},
     online: {type: Boolean, default: false},
+    facebookID : String,
     avatar: String,
     notifications:[],
     read_notification:{type: Boolean, default: false},
