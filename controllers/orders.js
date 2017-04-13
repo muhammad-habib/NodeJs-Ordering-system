@@ -11,7 +11,7 @@ var validator = require("validator");
 var multer = require('multer');
 
 router.get("/", function (request, response) {
-    console.log("q :",request.query.field);
+    console.log("q :", request.query.field);
     //var array = string.split(',');
     switch (request.query.field) {
         case "owner":
@@ -26,17 +26,27 @@ router.get("/", function (request, response) {
             });
             break;
         case "owners":
-        console.log(request.query.owners.split(','));
-        var ids=request.query.owners.split(',');
-            mongoose.model("orders").find({owner:{$in: ids.map(function(id){ return mongoose.Types.ObjectId(id); })}}).limit(1).populate("owner").exec(function (err, orders) {
-                if (err) {
-                    response.json({error: "Not found"});
-                    console.log("error in list orders");
-                } else {
-                    response.json(orders);
-                    console.log("orders :", orders);
-                }
-            });
+
+            if (request.query.owners != "") {
+                console.log(request.query.owners.split(','));
+                var ids = request.query.owners.split(',');
+                mongoose.model("orders").find({
+                    owner: {
+                        $in: ids.map(function (id) {
+                            return mongoose.Types.ObjectId(id);
+                        })
+                    }
+                }).limit(1).populate("owner").exec(function (err, orders) {
+                    if (err) {
+                        response.json({error: "Not found"});
+                        console.log("error in list orders");
+                    } else {
+                        response.json(orders);
+                        console.log("orders :", orders);
+                    }
+                });
+            }
+
             break;
     }
 });
@@ -96,13 +106,46 @@ router.post("/:order/meals/", function (request, response) {
 });
 
 router.delete("/:order/meals/:meal", function (request, response) {
-    mongoose.model("orders").update({_id: request.params.order}, {$pull: {meals : {_id: request.params.meal}}}, function (err, numAffected) {
+    mongoose.model("orders").update({_id: request.params.order}, {$pull: {meals: {_id: request.params.meal}}}, function (err, numAffected) {
         if (err) {
             response.status(400).json({error: err});
         } else {
             response.json(request.params);
         }
     });
+});
+
+router.delete("/:order/users/:user", function (request, response) {
+    mongoose.model("orders").findById(request.params.order, function (err, order) {
+        if (!err) {
+            if (helpers.isInArray(request.params.user, order.invited)) {
+
+                for (var i = 0; i < order.invited.length; i++) {
+                    if (order.invited[i].toString() == request.params.user) {
+                        order.invited.splice(i, 1);
+                    }
+                }
+
+                var j = order.meals.length;
+                while (j--) {
+                    if (order.meals[j].owner.toString() == request.params.user) {
+                        order.meals.splice(j, 1);
+                    }
+                }
+
+                order.save(function (error) {
+                    if (error) {
+                        response.json({error: "error in handeling your request"});
+                    } else {
+                        response.json(order);
+                    }
+                });
+            }
+            else {
+                response.json({error: "You are already deleted"});
+            }
+        }
+    })
 });
 
 router.get("/:id/friends", function (request, response) {
