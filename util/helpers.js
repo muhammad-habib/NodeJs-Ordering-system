@@ -6,8 +6,9 @@ module.exports = {
     },
 
     removeItem: function (arr, value) {
+
         for (var b in arr) {
-            if (arr[b] != null &&arr[b]._id === value._id) {
+            if (arr[b] != null && String(arr[b]) === String(value)) {
                 arr.splice(b, 1);
                 deletedUser = b;
                 break;

@@ -11,7 +11,8 @@ var users = new Schema({
     notifications:[],
     read_notification:{type: Boolean, default: false},
     access_token: String,
-    following: [{type: Schema.ObjectId, ref: "users"}]
+    following: [{type: Schema.ObjectId, ref: "users"}],
+    blocking: [{type: Schema.ObjectId, ref: "users"}],
 });
 
 users.index({name: 'text'});
