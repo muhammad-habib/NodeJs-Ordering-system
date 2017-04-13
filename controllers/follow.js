@@ -25,14 +25,28 @@ router.get('/add',function (request, response) {
                         response.json({error: "error in handeling your request"});
                     }
                     else{
-                        response.json(user);
+                        mongoose.model("users").findById(request.query.to, function (err, reciver) {
+                            if (!err) {
+                                reciver.notifications.push({body:user.name+" follow You", type:"friend"});
+                                reciver.save(function (error) {
+                                    if (!err)
+                                    {
+                                        console.log(reciver);
+                                        response.json(user);
+                                    }
+
+                                });
+                             }else{
+                                response.json({error: "error in handeling your request"});
+                             }
+                        });
                         if(usersSockets[request.query.to])
                         {
                             var userObj = {};
                             userObj['name'] = user.name;
                             userObj['body'] = user.name+" Follow You";
                             userObj['avatar'] = user.avatar;
-                            usersSockets[request.query.to].emit("message",{notification: userObj,user: user});
+                            usersSockets[request.query.to].emit("message",{notification: userObj,user: user,type:"friend"});
                         }
                     }
                     });
