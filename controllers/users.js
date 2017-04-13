@@ -41,13 +41,12 @@ router.get("/search",function (request, response) {
             mongoose.model("users").find({email: request.query.q}, function (err, user) {
                 if(!err)
                 {
-                    console.log(user[0].blocking)
-                    if(!helpers.isInArray(request.query.user_id, user[0].blocking))
-                    {
-                        response.json(user);
-                    }else {
-                        response.json({});
-                    }
+                        if( typeof user[0] != "undefined" && !helpers.isInArray(request.query.user_id, user[0].blocking))
+                        {
+                            response.json(user);
+                        }else {
+                            response.json({});
+                        }
                 }
                 else {
                     response.status(400).json({error: err});
