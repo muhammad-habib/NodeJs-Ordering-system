@@ -139,6 +139,7 @@ router.post("/facebook",function(request,response){
     if (user) {
             var userData = {
                     _id: user._id,
+                    facebookID : user.facebookID,
                     name: user.name,
                     email: user.email,
                     avatar : user.avatar,
@@ -161,13 +162,15 @@ router.post("/facebook",function(request,response){
                 if (!err) {
                   var userData = {
                      _id: user._id,
+                      facebookID : user.facebookID,
                      name: user.name,
                      email: user.email,
                      avatar : user.avatar,
                      token: jwt.sign({ sub: user._id }, config.APP_SECRET)
 
                           };
-                     console.log("user registered using fb") ;    
+                     console.log("new fb") ;
+                     console.log(userData) ;
                   response.json(userData);
                } else {
                response.status(400).json({error: "Registeration Failed"});
