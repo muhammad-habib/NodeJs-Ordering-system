@@ -18,6 +18,8 @@ var expressJwt = require('express-jwt');
 var mongoose = require("mongoose");
 mongoose.connect("mongodb://iti:iti_os_37@ds155160.mlab.com:55160/iti_orders");
 
+var port = process.env.PORT || 8080;
+
 
 //mongoose.connect("mongodb://localhost:27017/nodejs_project");
 
@@ -109,4 +111,6 @@ expressServer.use("/notification", notificationsRouter);
 expressServer.use("/upload", uploadRouter);
 expressServer.use("/orders", ordersRouter);
 
-httpSERVER.listen(80);
+httpSERVER.listen(port, function() {
+    console.log('Our app is running on http://localhost:' + port);
+});
