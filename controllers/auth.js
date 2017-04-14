@@ -103,8 +103,8 @@ router.post("/register", function (request, response) {
     if (validator.isEmpty(name) || validator.isEmpty(email) || validator.isEmpty(password)) {
         response.status(400).json({error: "Please Fill All The Fields"});
     }else{
-        UserModel.find({email: request.body.email}, function (err, users) {
-            if (users.length) {
+        UserModel.findOne({email: request.body.email}, function (err, user) {
+            if (user && !user.facebookID) {
                 response.status(400).json({error: "Email already in use."});
             } else {
                 var user = new UserModel({
@@ -134,10 +134,17 @@ router.post("/facebook",function(request,response){
   var name = request.body.name;
   var email = request.body.email;
   var avatar = request.body.avatar;
-  UserModel.findOne({facebookID: fb_id}, function (err, user) {
-   
-    if (user) {
-            var userData = {
+ 
+  UserModel.findOne({email: email}, function (err, user) {
+       
+    if (user) 
+        {   
+
+          user.facebookID = fb_id;
+
+          user.save(function(err){
+            if (!err) {
+                var userData = {
                     _id: user._id,
                     name: user.name,
                     email: user.email,
@@ -147,6 +154,8 @@ router.post("/facebook",function(request,response){
                 };
                 console.log("user logged using fb") ; 
                 response.json(userData);
+            }
+          })
         }
     else{
            var user = new UserModel({
@@ -154,7 +163,7 @@ router.post("/facebook",function(request,response){
                         name: name,
                         email: email,
                         avatar: avatar,
-                        password: '111'
+                        password: 'facebook_user'
                          });
 
             user.save(function (err) {
