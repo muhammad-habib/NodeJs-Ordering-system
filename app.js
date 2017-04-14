@@ -87,7 +87,10 @@ io.on('connection', function (socket) {
       if(obj.ids!=""){console.log("true");
       for(i=0;i<arr.length;i++){
         console.log("loop id :",arr[i])
-        usersSockets[arr[i]].emit("newOrder",{bool:true})
+          if (usersSockets[arr[i]]) {
+              usersSockets[arr[i]].emit("newOrder",{bool:true})
+          }
+
       }
     }
 
