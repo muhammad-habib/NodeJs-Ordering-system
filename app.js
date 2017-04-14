@@ -109,4 +109,4 @@ expressServer.use("/notification", notificationsRouter);
 expressServer.use("/upload", uploadRouter);
 expressServer.use("/orders", ordersRouter);
 
-httpSERVER.listen(8090);
+httpSERVER.listen(80);
