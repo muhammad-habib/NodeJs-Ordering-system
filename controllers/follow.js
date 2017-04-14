@@ -17,7 +17,7 @@ router.get('/add',function (request, response) {
                 if (helpers.isInArray(request.query.to, user.following)) {
                     response.json({error: "user  already in your followings"});
                 }
-                else 
+                else
                 {
                     user.following.push(request.query.to);
                     user.save(function (error) {
@@ -151,8 +151,8 @@ router.get('/unblock', function (request, response) {
                     else{
                         response.json(user);
                     }
-                    
-                    
+
+
                 });
             }
             else {
@@ -226,7 +226,7 @@ router.get('/list/followers', function (request, response) {
         }
     });
 });
-
+  
 
 
 
