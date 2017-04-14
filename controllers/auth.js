@@ -104,7 +104,7 @@ router.post("/register", function (request, response) {
         response.status(400).json({error: "Please Fill All The Fields"});
     }else{
         UserModel.findOne({email: request.body.email}, function (err, user) {
-            if (user && !user.facebookID) {
+            if (user) {
                 response.status(400).json({error: "Email already in use."});
             } else {
                 var user = new UserModel({
@@ -171,7 +171,7 @@ router.post("/facebook",function(request,response){
                 if (!err) {
                   var userData = {
                      _id: user._id,
-                      facebookID : user.facebookID,
+                     facebookID : user.facebookID,
                      name: user.name,
                      email: user.email,
                      avatar : user.avatar,
