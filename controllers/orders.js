@@ -15,7 +15,7 @@ router.get("/", function (request, response) {
     //var array = string.split(',');
     switch (request.query.field) {
         case "owner":
-            mongoose.model("orders").find({owner: new ObjectId(request.query.owner)}).limit(10).populate("owner").exec(function (err, orders) {
+            mongoose.model("orders").find({owner: new ObjectId(request.query.owner)}).limit(10).sort({ date: -1 }).populate("owner").exec(function (err, orders) {
                 if (err) {
                     response.json({error: "Not found"});
                     console.log("error in list orders");
@@ -36,13 +36,13 @@ router.get("/", function (request, response) {
                             return mongoose.Types.ObjectId(id);
                         })
                     }
-                }).limit(1).populate("owner").exec(function (err, orders) {
+                },{},{sort:{data:-1}}).populate("owner").exec(function (err, orders) {
                     if (err) {
                         response.json({error: "Not found"});
                         console.log("error in list orders");
                     } else {
                         response.json(orders);
-                        console.log("orders :", orders);
+                        console.log("latest orders :", orders);
                     }
                 });
             }
@@ -73,7 +73,7 @@ router.post("/", function (request, response) {
         order.save(function (err) {
             if (!err) {
                 response.json(order)
-        
+
             } else {
                 response.status(400).json({error: "Insert Failed."});
             }
