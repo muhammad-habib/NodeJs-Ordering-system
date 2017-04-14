@@ -61,6 +61,7 @@ expressServer.use(express.static('public'));
 
 
 io.on('connection', function (socket) {
+
     socket.on('disconnect', function () {
         delete usersSockets[socket.clientId];
     });
@@ -76,6 +77,20 @@ io.on('connection', function (socket) {
 
     socket.on('logout-message', function (obj) {
         delete usersSockets[socket.clientId];
+    })
+
+    //by seif: send to my followers
+    socket.on('toMyFollowers', function (obj) {
+      //console.log("soket: ",obj)
+      console.log("all sokets: ",usersSockets);
+      var arr=obj.ids.split(",")
+      if(obj.ids!=""){console.log("true");
+      for(i=0;i<arr.length;i++){
+        console.log("loop id :",arr[i])
+        usersSockets[arr[i]].emit("newOrder",{bool:true})
+      }
+    }
+
     })
 });
 
