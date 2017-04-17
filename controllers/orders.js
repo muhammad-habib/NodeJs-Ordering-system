@@ -53,7 +53,7 @@ router.get("/", function (request, response) {
                 for(i=0;i<ids.length;i++){
                   mongoose.model("orders").find({
                       owner: new ObjectId(ids[i])
-                  },{},{sort:{data:-1}}).limit(1).populate("owner").exec(function (err, order) {
+                  },{},{sort:{date:-1}}).limit(4).populate("owner").exec(function (err, order) {
                       if (err) {
                           //response.json({error: "Not found"});
                           console.log("error in list orders");
