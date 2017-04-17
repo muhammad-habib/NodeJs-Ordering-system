@@ -18,6 +18,8 @@ var expressJwt = require('express-jwt');
 var mongoose = require("mongoose");
 mongoose.connect("mongodb://iti:iti_os_37@ds155160.mlab.com:55160/iti_orders");
 
+var port = process.env.PORT || 8080;
+
 
 //mongoose.connect("mongodb://localhost:27017/nodejs_project");
 
@@ -85,14 +87,16 @@ io.on('connection', function (socket) {
     //by seif: send to my followers
     socket.on('toMyFollowers', function (obj) {
       //console.log("soket: ",obj)
-     // console.log("all sokets: ",usersSockets);
-      var arr=obj.ids.split(",");
-      if(obj.ids!=""){
-      if(usersSockets[arr[0]])
-      {
-         for(i=0;i<arr.length;i++){
-        usersSockets[arr[i]].emit("newOrder",{bool:true})
-      }
+      console.log("all sokets: ",usersSockets);
+      var arr=obj.ids.split(",")
+      if(obj.ids!=""){console.log("true");
+
+      if(usersSockets[arr[i]]){
+        for(i=0;i<arr.length;i++){
+          console.log("loop id :",arr[i])
+          usersSockets[arr[i]].emit("newOrder",{bool:true})
+        }
+
       }
     }
 
@@ -115,4 +119,6 @@ expressServer.use("/notification", notificationsRouter);
 expressServer.use("/upload", uploadRouter);
 expressServer.use("/orders", ordersRouter);
 
-httpSERVER.listen(8090);
+httpSERVER.listen(port, function() {
+    console.log('Our app is running on http://localhost:' + port);
+});
