@@ -33,6 +33,9 @@ fs.readdirSync(__dirname + "/models").forEach(function (file) {
     require("./models/" + file);
 });
 
+
+ //i.collection.drop(function (err) { cb(); });
+
 expressServer.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -61,7 +64,6 @@ expressServer.use(express.static('public'));
 
 
 io.on('connection', function (socket) {
-
     socket.on('disconnect', function () {
         delete usersSockets[socket.clientId];
     });
@@ -73,6 +75,7 @@ io.on('connection', function (socket) {
     socket.on('login-message', function (obj) {
         socket.clientId = obj.user_id;
         usersSockets[obj.user_id] = socket;
+      //  console.log(Object.keys(usersSockets).length);
     });
 
     socket.on('logout-message', function (obj) {
@@ -82,17 +85,23 @@ io.on('connection', function (socket) {
     //by seif: send to my followers
     socket.on('toMyFollowers', function (obj) {
       //console.log("soket: ",obj)
-      console.log("all sokets: ",usersSockets);
-      var arr=obj.ids.split(",")
-      if(obj.ids!=""){console.log("true");
-      for(i=0;i<arr.length;i++){
-        console.log("loop id :",arr[i])
+     // console.log("all sokets: ",usersSockets);
+      var arr=obj.ids.split(",");
+      if(obj.ids!=""){
+      if(usersSockets[arr[0]])
+      {
+         for(i=0;i<arr.length;i++){
         usersSockets[arr[i]].emit("newOrder",{bool:true})
+      }
       }
     }
 
     })
+    //console.log(Object.keys(usersSockets).length);
 });
+
+
+
 
 expressServer.use(bodyParser.urlencoded({extended: false}));
 expressServer.use(bodyParser.json());

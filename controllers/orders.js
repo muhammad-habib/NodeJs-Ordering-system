@@ -11,24 +11,24 @@ var validator = require("validator");
 var multer = require('multer');
 
 router.get("/", function (request, response) {
-    console.log("q :", request.query.field);
+    //console.log("q :", request.query.field);
     //var array = string.split(',');
     switch (request.query.field) {
         case "owner":
             mongoose.model("orders").find({owner: new ObjectId(request.query.owner)}).limit(10).populate("owner").exec(function (err, orders) {
                 if (err) {
                     response.json({error: "Not found"});
-                    console.log("error in list orders");
+                    //console.log("error in list orders");
                 } else {
                     response.json(orders);
-                    console.log("orders :", orders);
+                    //console.log("orders :", orders);
                 }
             });
             break;
         case "owners":
 
             if (request.query.owners != "") {
-                console.log(request.query.owners.split(','));
+                //console.log(request.query.owners.split(','));
                 var ids = request.query.owners.split(',');
                 mongoose.model("orders").find({
                     owner: {
@@ -36,13 +36,13 @@ router.get("/", function (request, response) {
                             return mongoose.Types.ObjectId(id);
                         })
                     }
-                }).limit(1).populate("owner").exec(function (err, orders) {
+                }).sort({date:-1}).limit(3).populate("owner").exec(function (err, orders) {
                     if (err) {
                         response.json({error: "Not found"});
-                        console.log("error in list orders");
+                        //console.log("error in list orders");
                     } else {
                         response.json(orders);
-                        console.log("orders :", orders);
+                        //console.log("orders :", orders);
                     }
                 });
             }
@@ -69,18 +69,50 @@ router.post("/", function (request, response) {
             owner: request.body.owner,
             invited: request.body.invited
         });
-
         order.save(function (err) {
             if (!err) {
-                response.json(order)
-        
+                mongoose.model("users").findById(request.body.owner, function (erro, owner) {
+                            if (!erro) {
+                                           for (var i = request.body.invited.length - 1; i >= 0; i--) {
+                                                mongoose.model("users").findById(request.body.invited[i], function (err, reciver) {
+                                                    if (!err) {
+                                                        reciver.notifications.push({body:owner.name+" added You to order", type:"order_invitation" ,order_id: order._id});
+                                                        reciver.unreaded_count++;
+
+                                                        reciver.save(function (error) {
+                                                            if (!error)
+                                                            {
+                                                             if(usersSockets[reciver._id])
+                                                                {
+                                                                    var userObj = {};
+                                                                    userObj['name'] = owner.name;
+                                                                    userObj['body'] = owner.name+" added You to order";
+                                                                    userObj['avatar'] = owner.avatar;
+                                                                    console.log(reciver.name +": "+reciver._id);
+                                                                    usersSockets[reciver._id].emit("message",{notification: userObj,user: owner,type:"order_invitation",order_id: order._id});
+                                                                }
+                                                            }
+
+                                                        });
+                                                     }else{
+                                                            console.log("error  in reciver");
+                                                        }
+                                                });
+                                            }
+                                            response.json(order);
+                             }else{
+                                console.log("error  in owner");
+                             }
+                });
             } else {
                 response.status(400).json({error: "Insert Failed."});
             }
         });
     }
-
 });
+
+
+
 
 router.get("/:order", function (request, response) {
     mongoose.model("orders").findOne({_id: request.params.order}).deepPopulate('owner meals.owner invited').exec(function (err, order) {
@@ -157,10 +189,10 @@ router.get("/:id/friends", function (request, response) {
         _id: 0,
         following: 1
     }).populate("following").exec(function (err, friends) {
-        console.log("prams", request.params);
+        //console.log("prams", request.params);
         if (err) {
             response.json({error: "Not found"});
-            console.log("error in list friends");
+            //console.log("error in list friends");
         }
         else {
 

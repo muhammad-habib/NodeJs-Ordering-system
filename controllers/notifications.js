@@ -14,6 +14,7 @@ router.get('/status',function (request, response) {
         if (!err)
         {
         	user.read_notification = true;
+            user.unreaded_count = 0;
         	user.save(function (error) {
                     if (error)
                         response.json({error: "error in handeling your request"});
@@ -26,10 +27,9 @@ router.get('/status',function (request, response) {
 
 router.get('/list',function (request, response) {
 
-    mongoose.model("users").findById(request.query.user_id,{notifications: 1,read_notification: 1},function (err, notifications) {
+    mongoose.model("users").findById(request.query.user_id,{notifications: 1,read_notification: 1, unreaded_count:1},function (err, notifications) {
         if (!err)
         {
-            console.log(notifications);
             response.json(notifications);
         }
     })

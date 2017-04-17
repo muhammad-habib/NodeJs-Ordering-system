@@ -28,10 +28,11 @@ router.get('/add',function (request, response) {
                         mongoose.model("users").findById(request.query.to, function (err, reciver) {
                             if (!err) {
                                 reciver.notifications.push({body:user.name+" follow You", type:"friend"});
+                                reciver.read_notification = false;
+                                reciver.unreaded_count++;
                                 reciver.save(function (error) {
                                     if (!err)
                                     {
-                                        console.log(reciver);
                                         response.json(user);
                                     }
 
@@ -141,7 +142,6 @@ router.get('/unblock', function (request, response) {
     mongoose.model("users").findById(request.query.from, function (err, user) {
         if (!err) {
             if (helpers.isInArray(request.query.to, user.blocking)) {
-                console.log(request.query.to);
                 user.blocking = helpers.removeItem(user.blocking, request.query.to);
                 user.save(function (error) {
                     if (error)

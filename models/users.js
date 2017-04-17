@@ -11,6 +11,7 @@ var users = new Schema({
     avatar: String,
     notifications:[],
     read_notification:{type: Boolean, default: false},
+    unreaded_count:{type: Number, default: 0},
     access_token: String,
     following: [{type: Schema.ObjectId, ref: "users"}],
     blocking: [{type: Schema.ObjectId, ref: "users"}],

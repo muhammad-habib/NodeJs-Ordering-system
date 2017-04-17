@@ -128,7 +128,6 @@ router.post("/register", function (request, response) {
 });
 
 router.post("/facebook",function(request,response){
-  console.log(request.body)
   var UserModel = mongoose.model("users");
   var fb_id = request.body.facebookID;
   var name = request.body.name;
@@ -145,7 +144,6 @@ router.post("/facebook",function(request,response){
                     token: jwt.sign({ sub: user._id }, config.APP_SECRET)
 
                 };
-                console.log("user logged using fb") ; 
                 response.json(userData);
         }
     else{
@@ -167,7 +165,6 @@ router.post("/facebook",function(request,response){
                      token: jwt.sign({ sub: user._id }, config.APP_SECRET)
 
                           };
-                     console.log("user registered using fb") ;    
                   response.json(userData);
                } else {
                response.status(400).json({error: "Registeration Failed"});
